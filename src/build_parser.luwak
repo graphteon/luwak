@@ -1,0 +1,4 @@
+fs = require 'fs'
+
+parser = require('./grammar').parser.generate(moduleMain: ->)
+fs.writeFileSync './parser.js', parser

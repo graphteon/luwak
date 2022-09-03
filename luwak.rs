@@ -1,5 +1,5 @@
 use deno_core::error::AnyError;
-use deno_core::FsModuleLoader;
+//use deno_core::FsModuleLoader;
 use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
 use luwaklib::deno_web::BlobStore;
 use luwaklib::module::LuwakModule;
@@ -62,7 +62,7 @@ async fn main() -> Result<(), AnyError> {
         stdio: Default::default(),
     };
 
-    let js_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("luwak.js");
+    let js_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("libs/luwak.js");
     let main_module = deno_core::resolve_url_or_path(&js_path.to_string_lossy())?;
     let permissions = Permissions::allow_all();
 
