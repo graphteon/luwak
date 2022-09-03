@@ -1,4 +1,3 @@
-// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
 use deno_core::Snapshot;
 use log::debug;
 use once_cell::sync::Lazy;
@@ -29,7 +28,7 @@ pub static CLI_SNAPSHOT: Lazy<Box<[u8]>> = Lazy::new(
 );
 
 pub fn deno_isolate_init() -> Snapshot {
-  debug!("Deno isolate init with snapshots.");
+  debug!("Luwak isolate init with snapshots.");
   Snapshot::Static(&*CLI_SNAPSHOT)
 }
 

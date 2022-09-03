@@ -1,25 +1,23 @@
-# Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
-
 [package]
-name = "deno_runtime"
-version = "0.74.0"
-authors = ["the Deno authors"]
+name = "luwak"
+version = "0.1.0"
+authors = ["Luwak Author"]
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/denoland/deno"
-description = "Provides the deno runtime library"
+repository = "https://github.com/mayarid/luwak"
+description = "Secure js runtime powered by deno and cofee"
 
 [features]
 # "fake" feature that allows to generate docs on docs.rs
 docsrs = []
 
 [lib]
-name = "deno_runtime"
+name = "luwaklib"
 path = "lib.rs"
 
-[[example]]
-name = "hello_runtime"
-path = "examples/hello_runtime.rs"
+[[bin]]
+name = "luwak"
+path = "luwak.rs"
 
 [build-dependencies]
 deno_broadcast_channel = { version = "0.60.0" }

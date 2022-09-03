@@ -1,5 +1,3 @@
-// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
-
 use crate::inspector_server::InspectorServer;
 use crate::js;
 use crate::ops;
@@ -416,7 +414,7 @@ mod tests {
         runtime_version: "x".to_string(),
         ts_version: "x".to_string(),
         unstable: false,
-        user_agent: "x".to_string(),
+        user_agent: "luwak".to_string(),
       },
       extensions: vec![],
       unsafely_ignore_certificate_errors: None,

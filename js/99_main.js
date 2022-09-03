@@ -70,6 +70,7 @@ delete Intl.v8BreakIterator;
   const formData = window.__bootstrap.formData;
   const fetch = window.__bootstrap.fetch;
   const prompt = window.__bootstrap.prompt;
+  const luwak = window.__bootstrap.luwak;
   const messagePort = window.__bootstrap.messagePort;
   const denoNs = window.__bootstrap.denoNs;
   const denoNsUnstable = window.__bootstrap.denoNsUnstable;
@@ -533,6 +534,7 @@ delete Intl.v8BreakIterator;
     alert: util.writable(prompt.alert),
     confirm: util.writable(prompt.confirm),
     prompt: util.writable(prompt.prompt),
+    luwak: util.writable(luwak),
     localStorage: {
       configurable: true,
       enumerable: true,
