@@ -2,6 +2,10 @@ use std::fs;
 use std::path::Path;
 use std::pin::Pin;
 
+use http_cache_reqwest::{CACacheManager, Cache, CacheMode, HttpCache};
+use reqwest::Client;
+use reqwest_middleware::ClientBuilder;
+
 use data_url::DataUrl;
 use deno_ast::{MediaType, ParseParams, SourceTextInfo};
 use deno_core::anyhow::{anyhow, bail, Error};
@@ -41,38 +45,53 @@ impl ModuleLoader for LuwakModule {
         async move {
             let bytes = match module_specifier.scheme() {
                 "http" | "https" => {
-                    let module_url = Url::parse(module_specifier.as_str()).unwrap();
-                    let module_url_path = luwak_path.join(
-                        module_url
-                            .join("./")
-                            .unwrap()
-                            .as_str()
-                            .replace("https://", "")
-                            .replace("http://", ""),
-                    );
-                    let module_url_file = luwak_path.join(
-                        module_url
-                            .as_str()
-                            .replace("https://", "")
-                            .replace("http://", ""),
-                    );
+                    // let module_url = Url::parse(module_specifier.as_str()).unwrap();
+                    // let module_url_path = luwak_path.join(
+                    //     module_url
+                    //         .join("./")
+                    //         .unwrap()
+                    //         .as_str()
+                    //         .replace("https://", "")
+                    //         .replace("http://", ""),
+                    // );
+                    // let module_url_file = luwak_path.join(
+                    //     module_url
+                    //         .as_str()
+                    //         .replace("https://", "")
+                    //         .replace("http://", ""),
+                    // );
 
-                    println!("file {}", module_url_file.to_string_lossy());
-                    if !module_url_path.exists() {
-                        println!("directory {}", module_url_path.to_string_lossy());
-                        fs::create_dir_all(module_url_path);
-                    }
+                    // println!("file {}", module_url_file.to_string_lossy());
+                    // if !module_url_path.exists() {
+                    //     println!("directory {}", module_url_path.to_string_lossy());
+                    //     fs::create_dir_all(module_url_path);
+                    // }
 
-                    if module_url_file.exists() {
-                        let bytes = tokio::fs::read(module_url_file).await?;
-                    }
+                    // if module_url_file.exists() {
+                    //     let bytes = tokio::fs::read(module_url_file).await?;
+                    // }
 
-                    println!("Download : {}", module_specifier);
+                    //println!("Download : {}", module_specifier);
 
-                    let res = reqwest::get(module_specifier).await?;
-                    // TODO: The HTML spec says to fail if the status is not
-                    // 200-299, but `error_for_status()` fails if the status is
-                    // 400-599.
+                    // let res = reqwest::get(module_specifier).await?;
+                    // // TODO: The HTML spec says to fail if the status is not
+                    // // 200-299, but `error_for_status()` fails if the status is
+                    // // 400-599.
+                    // let res = res.error_for_status()?;
+                    // res.bytes().await?
+
+
+                    let client = ClientBuilder::new(Client::new())
+                        .with(Cache(HttpCache {
+                            mode: CacheMode::Default,
+                            manager: CACacheManager::default(),
+                            options: None,
+                        }))
+                        .build();
+                    let res = client
+                        .get(module_specifier)
+                        .send()
+                        .await?;
                     let res = res.error_for_status()?;
                     res.bytes().await?
                 }
