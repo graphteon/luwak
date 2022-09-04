@@ -1,3 +1,5 @@
+use std::fs;
+use std::path::Path;
 use std::pin::Pin;
 
 use data_url::DataUrl;
@@ -5,6 +7,7 @@ use deno_ast::{MediaType, ParseParams, SourceTextInfo};
 use deno_core::anyhow::{anyhow, bail, Error};
 use deno_core::futures::FutureExt;
 use deno_core::resolve_import;
+use deno_core::url::Url;
 use deno_core::ModuleLoader;
 use deno_core::ModuleSource;
 use deno_core::ModuleSourceFuture;
@@ -31,10 +34,41 @@ impl ModuleLoader for LuwakModule {
     ) -> Pin<Box<ModuleSourceFuture>> {
         let module_specifier = module_specifier.clone();
         let string_specifier = module_specifier.to_string();
+        let luwak_path = Path::new(env!("HOME")).join(".luwak/modules");
+        if !luwak_path.exists() {
+            fs::create_dir_all(&luwak_path);
+        }
         async move {
             let bytes = match module_specifier.scheme() {
                 "http" | "https" => {
-                    println!("{}",module_specifier);
+                    let module_url = Url::parse(module_specifier.as_str()).unwrap();
+                    let module_url_path = luwak_path.join(
+                        module_url
+                            .join("./")
+                            .unwrap()
+                            .as_str()
+                            .replace("https://", "")
+                            .replace("http://", ""),
+                    );
+                    let module_url_file = luwak_path.join(
+                        module_url
+                            .as_str()
+                            .replace("https://", "")
+                            .replace("http://", ""),
+                    );
+
+                    println!("file {}", module_url_file.to_string_lossy());
+                    if !module_url_path.exists() {
+                        println!("directory {}", module_url_path.to_string_lossy());
+                        fs::create_dir_all(module_url_path);
+                    }
+
+                    if module_url_file.exists() {
+                        let bytes = tokio::fs::read(module_url_file).await?;
+                    }
+
+                    println!("Download : {}", module_specifier);
+
                     let res = reqwest::get(module_specifier).await?;
                     // TODO: The HTML spec says to fail if the status is not
                     // 200-299, but `error_for_status()` fails if the status is

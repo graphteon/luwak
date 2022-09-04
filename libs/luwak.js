@@ -4,7 +4,7 @@
 // console.log(serve)
 // window.luwak = Deno;
 import { createRequire } from 'https://deno.land/std@0.153.0/node/module.ts';
-import { compile } from './coffeescript.js';
+import { compile } from './parser.js';
 
 window.require = createRequire(import.meta.url);
 window.lwk = {
@@ -18,6 +18,8 @@ window.lwk = {
 ////eval(compile(luwak_script));
 
 //const a = require(lwk.__script_path+'webserver.js');
-import a from '/Volumes/git/MAYAR/luwak/target/debug/webserver.js';
-a();
-console.log(lwk.__script_path+'webserver.js');
+// import a from '/Volumes/git/MAYAR/luwak/target/debug/webserver.js';
+// a();
+// console.log(lwk.__script_path+'webserver.js');
+
+console.log(compile);

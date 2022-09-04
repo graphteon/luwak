@@ -35,7 +35,7 @@ async fn main() -> Result<(), AnyError> {
             location: None,
             no_color: false,
             is_tty: false,
-            runtime_version: "x".to_string(),
+            runtime_version: "1.0.0".to_string(),
             ts_version: "x".to_string(),
             unstable: false,
             user_agent: "luwak".to_string(),
@@ -62,7 +62,14 @@ async fn main() -> Result<(), AnyError> {
         stdio: Default::default(),
     };
 
-    let js_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("libs/luwak.js");
+    let source_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("libs/luwak.js");
+    let luwak_path = Path::new(env!("HOME")).join(".luwak/libs/luwak.js");
+    let js_path;
+    if source_path.exists() {
+        js_path = source_path;
+    } else {
+        js_path = luwak_path;
+    }
     let main_module = deno_core::resolve_url_or_path(&js_path.to_string_lossy())?;
     let permissions = Permissions::allow_all();
 
