@@ -17,5 +17,7 @@ window.lwk = {
 //console.log(compile(luwak_script));
 ////eval(compile(luwak_script));
 
-require(lwk.__script_path+'webserver.js');
+//const a = require(lwk.__script_path+'webserver.js');
+import a from '/Volumes/git/MAYAR/luwak/target/debug/webserver.js';
+a();
 console.log(lwk.__script_path+'webserver.js');

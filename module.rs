@@ -34,6 +34,7 @@ impl ModuleLoader for LuwakModule {
         async move {
             let bytes = match module_specifier.scheme() {
                 "http" | "https" => {
+                    println!("{}",module_specifier);
                     let res = reqwest::get(module_specifier).await?;
                     // TODO: The HTML spec says to fail if the status is not
                     // 200-299, but `error_for_status()` fails if the status is
