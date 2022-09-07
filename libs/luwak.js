@@ -12,7 +12,7 @@ window.lwk = {
 }
 
 //console.log(lwk.__script_path)
-//const luwak_script = await Deno.readTextFile(lwk.__script_path+"../../tests/webserver.luwak");
+const luwak_script = await Deno.readTextFile(lwk.__script_path+"../../tests/webserver.luwak");
 //const luwak_script = await Deno.readTextFile("./webserver.js");
 //console.log(compile(luwak_script));
 ////eval(compile(luwak_script));
@@ -22,4 +22,4 @@ window.lwk = {
 // a();
 // console.log(lwk.__script_path+'webserver.js');
 
-console.log(compile);
+console.log(compile(luwak_script));

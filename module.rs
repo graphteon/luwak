@@ -71,7 +71,7 @@ impl ModuleLoader for LuwakModule {
                     //     let bytes = tokio::fs::read(module_url_file).await?;
                     // }
 
-                    //println!("Download : {}", module_specifier);
+                    println!("Download : {}", module_specifier);
 
                     // let res = reqwest::get(module_specifier).await?;
                     // // TODO: The HTML spec says to fail if the status is not
