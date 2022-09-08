@@ -95,6 +95,21 @@ impl ModuleLoader for LuwakModule {
                     let res = res.error_for_status()?;
                     res.bytes().await?
                 }
+                "node" => {
+                    let module_url = Url::parse(module_specifier.as_str()).unwrap();
+                    let module_url_file = module_url
+                    .as_str()
+                    .replace("node://", "https://esm.sh/");
+
+                    println!("Download : {}", module_url);
+
+                    let res = reqwest::get(module_url_file).await?;
+                    // TODO: The HTML spec says to fail if the status is not
+                    // 200-299, but `error_for_status()` fails if the status is
+                    // 400-599.
+                    let res = res.error_for_status()?;
+                    res.bytes().await?
+                }
                 "file" => {
                     let path = match module_specifier.to_file_path() {
                         Ok(path) => path,
