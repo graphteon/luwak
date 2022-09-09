@@ -44,9 +44,10 @@ impl Middleware for LuwakReqwest {
         // if module_url_file.exists() {
         //     let bytes = tokio::fs::read(module_url_file).await?;
         // }
-        println!("Request started {:?}", req);
+        //println!("Request started {:?}", req);
         let res = next.run(req, extensions).await;
-        //println!("Result: {:?}", res);
+        let data = &res?.error_for_status();
+        println!("Result: {:?}", data.text().await?);
         res
     }
 }
