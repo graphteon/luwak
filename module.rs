@@ -5,6 +5,7 @@ use std::pin::Pin;
 use http_cache_reqwest::{CACacheManager, Cache, CacheMode, HttpCache};
 use reqwest::Client;
 use reqwest_middleware::ClientBuilder;
+use crate::luwak_reqwest::LuwakReqwest;
 
 use data_url::DataUrl;
 use deno_ast::{MediaType, ParseParams, SourceTextInfo};
@@ -38,10 +39,10 @@ impl ModuleLoader for LuwakModule {
     ) -> Pin<Box<ModuleSourceFuture>> {
         let module_specifier = module_specifier.clone();
         let string_specifier = module_specifier.to_string();
-        let luwak_path = Path::new(env!("HOME")).join(".luwak/modules");
-        if !luwak_path.exists() {
-            fs::create_dir_all(&luwak_path);
-        }
+        // let luwak_path = Path::new(env!("HOME")).join(".luwak/modules");
+        // if !luwak_path.exists() {
+        //     fs::create_dir_all(&luwak_path);
+        // }
         async move {
             let bytes = match module_specifier.scheme() {
                 "http" | "https" => {
@@ -82,11 +83,12 @@ impl ModuleLoader for LuwakModule {
 
 
                     let client = ClientBuilder::new(Client::new())
-                        .with(Cache(HttpCache {
-                            mode: CacheMode::Default,
-                            manager: CACacheManager::default(),
-                            options: None,
-                        }))
+                        // .with(Cache(HttpCache {
+                        //     mode: CacheMode::Default,
+                        //     manager: CACacheManager::default(),
+                        //     options: None,
+                        // }))
+                        .with(LuwakReqwest)
                         .build();
                     let res = client
                         .get(module_specifier)
