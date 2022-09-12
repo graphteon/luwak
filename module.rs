@@ -93,7 +93,7 @@ impl ModuleLoader for LuwakModule {
                         } else {
                             save_file_to = module_url_file.join("index.js");
                         }
-                        let _ = match download_luwak_module(
+                        let _ = download_luwak_module(
                             module_download_file.as_str(),
                             &save_file_to.to_string_lossy(),
                         );

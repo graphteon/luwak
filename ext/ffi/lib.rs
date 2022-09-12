@@ -1,5 +1,3 @@
-// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
-
 use core::ptr::NonNull;
 use deno_core::anyhow::anyhow;
 use deno_core::error::generic_error;
