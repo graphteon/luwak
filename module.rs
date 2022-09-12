@@ -6,9 +6,6 @@ use std::cmp::min;
 use std::fs::File;
 use std::io::Write;
 
-use futures_util::StreamExt;
-use indicatif::{ProgressBar, ProgressStyle};
-
 use crate::download::download_luwak_module;
 use http_cache_reqwest::{CACacheManager, Cache, CacheMode, HttpCache};
 use reqwest::Client;
@@ -93,10 +90,10 @@ impl ModuleLoader for LuwakModule {
                         } else {
                             save_file_to = module_url_file.join("index.js");
                         }
-                        let _ = download_luwak_module(
+                        download_luwak_module(
                             module_download_file.as_str(),
                             &save_file_to.to_string_lossy(),
-                        );
+                        ).await.unwrap();
                         println!("save to : {:?}", save_file_to);
                         path = save_file_to;
                     } else {
