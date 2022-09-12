@@ -1,0 +1,3 @@
+[submodule "ext/ffi/tinycc"]
+	path = ext/ffi/tinycc
+	url = https://github.com/TinyCC/tinycc.git
