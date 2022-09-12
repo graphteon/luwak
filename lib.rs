@@ -18,6 +18,7 @@ pub use deno_websocket;
 pub use deno_webstorage;
 
 pub mod colors;
+pub mod download;
 pub mod errors;
 pub mod fs_util;
 pub mod inspector_server;
@@ -28,7 +29,7 @@ pub mod permissions;
 pub mod tokio_util;
 pub mod web_worker;
 pub mod worker;
-pub mod luwak_reqwest;
+//pub mod luwak_reqwest;
 
 mod worker_bootstrap;
 pub use worker_bootstrap::BootstrapOptions;

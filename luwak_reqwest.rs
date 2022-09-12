@@ -1,5 +1,5 @@
 use reqwest::{Client, Request, Response};
-use reqwest_middleware::{ClientBuilder, Middleware, Next, Result};
+use reqwest_middleware::{ClientBuilder, Middleware, Next, Result, Error};
 use task_local_extensions::Extensions;
 use std::path::Path;
 use std::fs;
@@ -47,7 +47,10 @@ impl Middleware for LuwakReqwest {
         //println!("Request started {:?}", req);
         let res = next.run(req, extensions).await;
         let data = &res?.error_for_status();
-        println!("Result: {:?}", data.text().await?);
+        let resx = match data {
+            Ok(res) => res,
+        };
+        println!("Result: {:?}", resx.text().await?);
         res
     }
 }
