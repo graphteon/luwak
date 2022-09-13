@@ -2,6 +2,11 @@ use std::fs;
 use std::path::Path;
 use std::pin::Pin;
 
+use std::cmp::min;
+use std::fs::File;
+use std::io::Write;
+
+use crate::download::download_luwak_module;
 use http_cache_reqwest::{CACacheManager, Cache, CacheMode, HttpCache};
 use reqwest::Client;
 use reqwest_middleware::ClientBuilder;
@@ -38,85 +43,77 @@ impl ModuleLoader for LuwakModule {
     ) -> Pin<Box<ModuleSourceFuture>> {
         let module_specifier = module_specifier.clone();
         let string_specifier = module_specifier.to_string();
-        let luwak_path = Path::new(env!("HOME")).join(".luwak/modules");
-        if !luwak_path.exists() {
-            fs::create_dir_all(&luwak_path);
-        }
         async move {
-            let bytes = match module_specifier.scheme() {
-                "http" | "https" => {
+            let bytes: _ = match module_specifier.scheme() {
+                "node" | "http" | "https" | "file" => {
+                    let luwak_path = Path::new(env!("HOME")).join(".luwak/modules");
+                    if !luwak_path.exists() {
+                        fs::create_dir_all(&luwak_path);
+                    }
+                    let module_url = Url::parse(module_specifier.as_str()).unwrap();
+                    let module_url_path = luwak_path.join(
+                        module_url
+                            .join("./")
+                            .unwrap()
+                            .as_str()
+                            .replace("https://", "")
+                            .replace("http://", "")
+                            .replace("node://", ""),
+                    );
+                    let module_url_file = luwak_path.join(
+                        module_url
+                            .as_str()
+                            .replace("https://", "")
+                            .replace("http://", "")
+                            .replace("node://", ""),
+                    );
+
+                    // println!("file {}", module_specifier.as_str());
+                    if !module_url_path.exists() && module_specifier.scheme() != "file" {
+                        fs::create_dir_all(module_url_path);
+                    }
+
+                    let path;
+                    if module_specifier.scheme() != "file" {
+                        let module_download = Url::parse(module_specifier.as_str()).unwrap();
+                        let module_download_file =
+                            module_url.as_str().replace("node://", "https://esm.sh/");
+                        let save_file_to;
+                        if module_url_file.extension().unwrap().to_str().unwrap() != "0" {
+                            save_file_to = module_url_file;
+                        } else {
+                            save_file_to = module_url_file.join("index.js");
+                        }
+                        if !save_file_to.exists() {
+                            download_luwak_module(
+                                module_download_file.as_str(),
+                                &save_file_to.to_string_lossy(),
+                            )
+                            .await
+                            .unwrap();
+                        }
+                        path = save_file_to;
+                    } else {
+                        path = match module_specifier.to_file_path() {
+                            Ok(path) => path,
+                            Err(_) => bail!("Invalid file URL."),
+                        };
+                    }
+
+                    let bytes = tokio::fs::read(path).await?;
+                    bytes
+
                     // let module_url = Url::parse(module_specifier.as_str()).unwrap();
-                    // let module_url_path = luwak_path.join(
-                    //     module_url
-                    //         .join("./")
-                    //         .unwrap()
-                    //         .as_str()
-                    //         .replace("https://", "")
-                    //         .replace("http://", ""),
-                    // );
-                    // let module_url_file = luwak_path.join(
-                    //     module_url
-                    //         .as_str()
-                    //         .replace("https://", "")
-                    //         .replace("http://", ""),
-                    // );
+                    // let module_url_file = module_url.as_str().replace("node://", "https://esm.sh/");
 
-                    // println!("file {}", module_url_file.to_string_lossy());
-                    // if !module_url_path.exists() {
-                    //     println!("directory {}", module_url_path.to_string_lossy());
-                    //     fs::create_dir_all(module_url_path);
-                    // }
+                    // println!("Download : {}", module_url);
 
-                    // if module_url_file.exists() {
-                    //     let bytes = tokio::fs::read(module_url_file).await?;
-                    // }
-
-                    println!("Download : {}", module_specifier);
-
-                    // let res = reqwest::get(module_specifier).await?;
+                    // let res = reqwest::get(module_url_file).await?;
                     // // TODO: The HTML spec says to fail if the status is not
                     // // 200-299, but `error_for_status()` fails if the status is
                     // // 400-599.
                     // let res = res.error_for_status()?;
                     // res.bytes().await?
-
-
-                    let client = ClientBuilder::new(Client::new())
-                        .with(Cache(HttpCache {
-                            mode: CacheMode::Default,
-                            manager: CACacheManager::default(),
-                            options: None,
-                        }))
-                        .build();
-                    let res = client
-                        .get(module_specifier)
-                        .send()
-                        .await?;
-                    let res = res.error_for_status()?;
-                    res.bytes().await?
-                }
-                "node" => {
-                    let module_url = Url::parse(module_specifier.as_str()).unwrap();
-                    let module_url_file = module_url
-                    .as_str()
-                    .replace("node://", "https://esm.sh/");
-
-                    println!("Download : {}", module_url);
-
-                    let res = reqwest::get(module_url_file).await?;
-                    // TODO: The HTML spec says to fail if the status is not
-                    // 200-299, but `error_for_status()` fails if the status is
-                    // 400-599.
-                    let res = res.error_for_status()?;
-                    res.bytes().await?
-                }
-                "file" => {
-                    let path = match module_specifier.to_file_path() {
-                        Ok(path) => path,
-                        Err(_) => bail!("Invalid file URL."),
-                    };
-                    let bytes = tokio::fs::read(path).await?;
-                    bytes.into()
                 }
                 "data" => {
                     let url = match DataUrl::process(module_specifier.as_str()) {
@@ -133,11 +130,11 @@ impl ModuleLoader for LuwakModule {
             };
 
             // Strip BOM
-            let bytes = if bytes.starts_with(&[0xEF, 0xBB, 0xBF]) {
-                bytes.slice(3..)
-            } else {
-                bytes
-            };
+            // let bytes = if bytes.starts_with(&[0xEF, 0xBB, 0xBF]) {
+            //     bytes.slice(3..)
+            // } else {
+            //     bytes
+            // };
 
             let parsed = deno_ast::parse_module(ParseParams {
                 specifier: string_specifier.clone(),

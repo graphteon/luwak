@@ -1,5 +1,3 @@
-// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
-
 use atty;
 use once_cell::sync::Lazy;
 use std::fmt;

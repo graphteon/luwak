@@ -1,5 +1,3 @@
-// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
-
 use deno_core::anyhow::Context;
 use deno_core::error::AnyError;
 pub use deno_core::normalize_path;

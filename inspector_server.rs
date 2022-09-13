@@ -1,5 +1,3 @@
-// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
-
 use core::convert::Infallible as Never; // Alias for the future `!` type.
 use deno_core::error::AnyError;
 use deno_core::futures::channel::mpsc;

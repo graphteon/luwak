@@ -1,4 +1,3 @@
-// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
 use crate::colors;
 use crate::inspector_server::InspectorServer;
 use crate::js;
