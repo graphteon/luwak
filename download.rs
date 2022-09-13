@@ -7,7 +7,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::Client;
 
 pub async fn download_luwak_module(url: &str, path: &str) -> Result<(), String> {
-    println!("Download file {} to {}", url, path);
+    println!("Download : {}", url);
     let client = Client::new();
     let res = client
         .get(url)
@@ -17,7 +17,7 @@ pub async fn download_luwak_module(url: &str, path: &str) -> Result<(), String> 
     // let total_size = res
     //     .content_length()
     //     .ok_or(format!("Failed to get content length from '{}'", &url))?;
-    
+
     // // Indicatif setup
     // let pb = ProgressBar::new(total_size);
     // pb.set_style(ProgressStyle::default_bar()

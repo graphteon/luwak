@@ -68,9 +68,8 @@ impl ModuleLoader for LuwakModule {
                             .replace("node://", ""),
                     );
 
-                    println!("file {}", module_specifier.as_str());
+                    // println!("file {}", module_specifier.as_str());
                     if !module_url_path.exists() && module_specifier.scheme() != "file" {
-                        println!("directory {}", module_url_path.to_string_lossy());
                         fs::create_dir_all(module_url_path);
                     }
 
@@ -79,22 +78,20 @@ impl ModuleLoader for LuwakModule {
                         let module_download = Url::parse(module_specifier.as_str()).unwrap();
                         let module_download_file =
                             module_url.as_str().replace("node://", "https://esm.sh/");
-
-                        println!(
-                            "Download : {:?}",
-                            module_url_file.extension().unwrap().to_str()
-                        );
                         let save_file_to;
                         if module_url_file.extension().unwrap().to_str().unwrap() != "0" {
                             save_file_to = module_url_file;
                         } else {
                             save_file_to = module_url_file.join("index.js");
                         }
-                        download_luwak_module(
-                            module_download_file.as_str(),
-                            &save_file_to.to_string_lossy(),
-                        ).await.unwrap();
-                        println!("save to : {:?}", save_file_to);
+                        if !save_file_to.exists() {
+                            download_luwak_module(
+                                module_download_file.as_str(),
+                                &save_file_to.to_string_lossy(),
+                            )
+                            .await
+                            .unwrap();
+                        }
                         path = save_file_to;
                     } else {
                         path = match module_specifier.to_file_path() {
@@ -118,14 +115,6 @@ impl ModuleLoader for LuwakModule {
                     // let res = res.error_for_status()?;
                     // res.bytes().await?
                 }
-                // "file" => {
-                //     let path = match module_specifier.to_file_path() {
-                //         Ok(path) => path,
-                //         Err(_) => bail!("Invalid file URL."),
-                //     };
-                //     let bytes = tokio::fs::read(path).await?;
-                //     bytes.into()
-                // }
                 "data" => {
                     let url = match DataUrl::process(module_specifier.as_str()) {
                         Ok(url) => url,
