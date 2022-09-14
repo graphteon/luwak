@@ -18,6 +18,10 @@ jobs:
             archive: zip
     steps:
       - uses: actions/checkout@master
+      - name: Git Sumbodule Update
+        run: |
+          git pull --recurse-submodules
+          git submodule update --remote --recursive
       - name: Compile and release
         uses: rust-build/rust-build.action@v1.3.2
         env:
