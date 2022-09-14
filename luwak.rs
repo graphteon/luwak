@@ -28,7 +28,7 @@ struct Args {
     #[clap(short, long, value_parser, default_value_t = num_cpus::get())]
     cpu: usize,
 
-    /// Number of cpu
+    /// Enable tty
     #[clap(short, long, value_parser)]
     tty: bool,
 
