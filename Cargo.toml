@@ -20,23 +20,23 @@ name = "luwak"
 path = "luwak.rs"
 
 [build-dependencies]
-deno_broadcast_channel = { version = "0.60.0" }
-deno_console = { version = "0.66.0" }
-deno_core = { version = "0.148.0" }
-deno_crypto = { version = "0.80.0" }
-deno_fetch = { version = "0.89.0" }
-deno_ffi = { version = "0.53.0", path = "./ext/ffi" }
-deno_flash = { version = "0.2.0" }
-deno_http = { version = "0.60.0" }
-deno_net = { version = "0.58.0" }
-deno_node = { version = "0.3.0" }
-deno_tls = { version = "0.53.0" }
-deno_url = { version = "0.66.0" }
-deno_web = { version = "0.97.0" }
-deno_webgpu = { version = "0.67.0" }
-deno_webidl = { version = "0.66.0"}
-deno_websocket = { version = "0.71.0" }
-deno_webstorage = { version = "0.61.0" }
+deno_broadcast_channel = { version = "0.62.0"}
+deno_console = { version = "0.68.0" }
+deno_core = { version = "0.150.0" }
+deno_crypto = { version = "0.82.0"}
+deno_fetch = { version = "0.91.0"}
+deno_ffi = { version = "0.55.0"}
+deno_flash = { version = "0.4.0"}
+deno_http = { version = "0.62.0"}
+deno_net = { version = "0.60.0"}
+deno_node = { version = "0.5.0"}
+deno_tls = { version = "0.55.0"}
+deno_url = { version = "0.68.0"}
+deno_web = { version = "0.99.0"}
+deno_webgpu = { version = "0.69.0"}
+deno_webidl = { version = "0.68.0"}
+deno_websocket = { version = "0.73.0"}
+deno_webstorage = { version = "0.63.0"}
 deno_ast = { version = "0.18.1", features = ["transpiling"] }
 
 lzzzz = '1.0'
@@ -47,23 +47,23 @@ winres = "0.1.11"
 winapi = "0.3.9"
 
 [dependencies]
-deno_broadcast_channel = { version = "0.60.0"}
-deno_console = { version = "0.66.0" }
-deno_core = { version = "0.148.0" }
-deno_crypto = { version = "0.80.0"}
-deno_fetch = { version = "0.89.0"}
-deno_ffi = { version = "0.53.0", path = "./ext/ffi" }
-deno_flash = { version = "0.2.0"}
-deno_http = { version = "0.60.0"}
-deno_net = { version = "0.58.0"}
-deno_node = { version = "0.3.0"}
-deno_tls = { version = "0.53.0"}
-deno_url = { version = "0.66.0"}
-deno_web = { version = "0.97.0"}
-deno_webgpu = { version = "0.67.0"}
-deno_webidl = { version = "0.66.0"}
-deno_websocket = { version = "0.71.0"}
-deno_webstorage = { version = "0.61.0"}
+deno_broadcast_channel = { version = "0.62.0"}
+deno_console = { version = "0.68.0" }
+deno_core = { version = "0.150.0" }
+deno_crypto = { version = "0.82.0"}
+deno_fetch = { version = "0.91.0"}
+deno_ffi = { version = "0.55.0"}
+deno_flash = { version = "0.4.0"}
+deno_http = { version = "0.62.0"}
+deno_net = { version = "0.60.0"}
+deno_node = { version = "0.5.0"}
+deno_tls = { version = "0.55.0"}
+deno_url = { version = "0.68.0"}
+deno_web = { version = "0.99.0"}
+deno_webgpu = { version = "0.69.0"}
+deno_webidl = { version = "0.68.0"}
+deno_websocket = { version = "0.73.0"}
+deno_webstorage = { version = "0.63.0"}
 deno_ast = { version = "0.18.1", features = ["transpiling"] }
 
 atty = "0.2.14"
