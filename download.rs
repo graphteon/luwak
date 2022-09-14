@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::Write;
 
 use futures_util::StreamExt;
-use indicatif::{ProgressBar, ProgressStyle};
+// use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::Client;
 
 pub async fn download_luwak_module(url: &str, path: &str) -> Result<(), String> {
@@ -14,6 +14,7 @@ pub async fn download_luwak_module(url: &str, path: &str) -> Result<(), String> 
         .send()
         .await
         .or(Err(format!("Failed to GET from '{}'", &url)))?;
+    //// TODO
     // let total_size = res
     //     .content_length()
     //     .ok_or(format!("Failed to get content length from '{}'", &url))?;

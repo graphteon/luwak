@@ -1,5 +1,6 @@
+use clap::Parser;
 use deno_core::error::AnyError;
-//use deno_core::FsModuleLoader;
+use num_cpus;
 use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
 use luwaklib::deno_web::BlobStore;
 use luwaklib::module::LuwakModule;
@@ -15,9 +16,31 @@ fn get_error_class_name(e: &AnyError) -> &'static str {
     luwaklib::errors::get_error_class_name(e).unwrap_or("Error")
 }
 
+/// Simple program to greet a person
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about = None)]
+struct Args {
+    /// Javascript file location
+    #[clap(value_parser)]
+    js_script: String,
+
+    /// Number of cpu
+    #[clap(short, long, value_parser, default_value_t = num_cpus::get())]
+    cpu: usize,
+
+    /// Number of cpu
+    #[clap(short, long, value_parser)]
+    tty: bool,
+
+    /// Enable debuging flags
+    #[clap(short, long, value_parser)]
+    debug: bool,
+}
+
 #[tokio::main]
 async fn main() -> Result<(), AnyError> {
-    //let module_loader = Rc::new(FsModuleLoader);
+    let args = Args::parse();
+
     let module_loader = Rc::new(LuwakModule);
     let create_web_worker_cb = Arc::new(|_| {
         todo!("Web workers are not supported");
@@ -29,12 +52,12 @@ async fn main() -> Result<(), AnyError> {
     let options = WorkerOptions {
         bootstrap: BootstrapOptions {
             args: vec![],
-            cpu_count: 1,
-            debug_flag: false,
+            cpu_count: args.cpu,
+            debug_flag: args.debug,
             enable_testing_features: false,
             location: None,
             no_color: false,
-            is_tty: false,
+            is_tty: args.tty,
             runtime_version: "1.0.0".to_string(),
             ts_version: "x".to_string(),
             unstable: false,
@@ -62,14 +85,8 @@ async fn main() -> Result<(), AnyError> {
         stdio: Default::default(),
     };
 
-    let source_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("libs/luwak.js");
-    let luwak_path = Path::new(env!("HOME")).join(".luwak/libs/luwak.js");
-    let js_path;
-    if source_path.exists() {
-        js_path = source_path;
-    } else {
-        js_path = luwak_path;
-    }
+    let js_path = Path::new(&args.js_script);
+
     let main_module = deno_core::resolve_url_or_path(&js_path.to_string_lossy())?;
     let permissions = Permissions::allow_all();
 
