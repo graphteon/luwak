@@ -68,7 +68,7 @@ impl ModuleLoader for LuwakModule {
                             .replace("node://", ""),
                     );
 
-                    println!("DEBUG file {}", module_specifier.as_str());
+                    //println!("DEBUG file {}", module_specifier.as_str());
                     if !module_url_path.exists() && module_specifier.scheme() != "file" {
                         fs::create_dir_all(module_url_path);
                     }
