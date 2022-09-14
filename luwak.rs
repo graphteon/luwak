@@ -1,6 +1,5 @@
 use clap::Parser;
 use deno_core::error::AnyError;
-use num_cpus;
 use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
 use luwaklib::deno_web::BlobStore;
 use luwaklib::module::LuwakModule;
@@ -8,6 +7,7 @@ use luwaklib::permissions::Permissions;
 use luwaklib::worker::MainWorker;
 use luwaklib::worker::WorkerOptions;
 use luwaklib::BootstrapOptions;
+use num_cpus;
 use std::path::Path;
 use std::rc::Rc;
 use std::sync::Arc;
