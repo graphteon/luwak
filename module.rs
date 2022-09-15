@@ -79,7 +79,9 @@ impl ModuleLoader for LuwakModule {
                         let module_download_file =
                             module_url.as_str().replace("node://", "https://esm.sh/");
                         let save_file_to;
-                        if module_url_file.extension().unwrap().to_str().unwrap() == "js" || module_url_file.extension().unwrap().to_str().unwrap() == "ts" {
+                        if module_url_file.extension().unwrap().to_str().unwrap() == "js"
+                            || module_url_file.extension().unwrap().to_str().unwrap() == "ts"
+                        {
                             save_file_to = module_url_file;
                         } else {
                             save_file_to = module_url_file.join("index.js");

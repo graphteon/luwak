@@ -1,20 +1,19 @@
-use clap::Parser;
-use deno_core::error::AnyError;
-use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
 use luwaklib::deno_web::BlobStore;
-use luwaklib::module::LuwakModule;
-use luwaklib::permissions::Permissions;
-use luwaklib::worker::MainWorker;
-use luwaklib::worker::WorkerOptions;
-use luwaklib::BootstrapOptions;
-use num_cpus;
 use std::path::Path;
 use std::rc::Rc;
 use std::sync::Arc;
 
-fn get_error_class_name(e: &AnyError) -> &'static str {
-    luwaklib::errors::get_error_class_name(e).unwrap_or("Error")
-}
+use clap::Parser;
+use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
+use luwaklib::deno_core::anyhow::Result;
+use luwaklib::module::LuwakModule;
+use luwaklib::permissions::Permissions;
+use luwaklib::worker::{MainWorker, WorkerOptions};
+use luwaklib::{deno_core, BootstrapOptions};
+use num_cpus;
+use tokio::runtime::Builder;
+
+use crate::deno_core::error::AnyError;
 
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
@@ -37,8 +36,10 @@ struct Args {
     debug: bool,
 }
 
-#[tokio::main]
-async fn main() -> Result<(), AnyError> {
+fn get_error_class_name(e: &AnyError) -> &'static str {
+    luwaklib::errors::get_error_class_name(e).unwrap_or("Error")
+}
+fn main() -> Result<()> {
     let args = Args::parse();
 
     let module_loader = Rc::new(LuwakModule);
@@ -90,8 +91,19 @@ async fn main() -> Result<(), AnyError> {
     let main_module = deno_core::resolve_url_or_path(&js_path.to_string_lossy())?;
     let permissions = Permissions::allow_all();
 
-    let mut worker = MainWorker::bootstrap_from_options(main_module.clone(), permissions, options);
-    worker.execute_main_module(&main_module).await?;
-    worker.run_event_loop(false).await?;
+    let rt = Builder::new_current_thread().enable_all().build()?;
+
+    let fut = async move {
+        let mut worker =
+            MainWorker::bootstrap_from_options(main_module.clone(), permissions, options);
+
+        worker.execute_main_module(&main_module).await?;
+        worker.run_event_loop(false).await?;
+        Ok::<_, AnyError>(())
+    };
+
+    let local = tokio::task::LocalSet::new();
+    local.block_on(&rt, fut)?;
+
     Ok(())
 }
