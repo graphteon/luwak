@@ -24,7 +24,7 @@ struct Args {
     js_script: String,
 
     /// Number of cpu
-    #[clap(short, long, value_parser, default_value_t = num_cpus::get())]
+    #[clap(short, long, value_parser, default_value_t = std::thread::available_parallelism().map(|p| p.get()).unwrap_or(1))]
     cpu: usize,
 
     /// Enable tty
