@@ -75,7 +75,7 @@ impl ModuleLoader for LuwakModule {
 
                     let path;
                     if module_specifier.scheme() != "file" {
-                        let module_download = Url::parse(module_specifier.as_str()).unwrap();
+                        //let module_download = Url::parse(module_specifier.as_str()).unwrap();
                         let module_download_file =
                             module_url.as_str().replace("node://", "https://esm.sh/");
                         let save_file_to;
