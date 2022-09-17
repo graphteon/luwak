@@ -10,7 +10,6 @@ use luwaklib::module::LuwakModule;
 use luwaklib::permissions::Permissions;
 use luwaklib::worker::{MainWorker, WorkerOptions};
 use luwaklib::{deno_core, BootstrapOptions};
-use num_cpus;
 use tokio::runtime::Builder;
 
 use crate::deno_core::error::AnyError;
