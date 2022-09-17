@@ -81,6 +81,7 @@ impl ModuleLoader for LuwakModule {
                         let save_file_to;
                         if module_url_file.extension().unwrap().to_str().unwrap() == "js"
                             || module_url_file.extension().unwrap().to_str().unwrap() == "ts"
+                            || module_url_file.extension().unwrap().to_str().unwrap() == "mjs"
                         {
                             save_file_to = module_url_file;
                         } else {
