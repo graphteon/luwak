@@ -16,4 +16,4 @@ console.log(path);
 // // Uses Node resolution in `node_modules` to load the package/module. The
 // // package would need to be installed locally via a package management tool
 // // like npm:
-// const leftPad = require("left-pad");
+const leftPad = require("left-pad");
