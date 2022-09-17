@@ -1,4 +1,4 @@
-use std::cmp::min;
+// use std::cmp::min;
 use std::fs::File;
 use std::io::Write;
 
@@ -28,7 +28,7 @@ pub async fn download_luwak_module(url: &str, path: &str) -> Result<(), String> 
 
     // download chunks
     let mut file = File::create(path).or(Err(format!("Failed to create file '{}'", path)))?;
-    let mut downloaded: u64 = 0;
+    //let mut downloaded: u64 = 0;
     let mut stream = res.bytes_stream();
 
     while let Some(item) = stream.next().await {

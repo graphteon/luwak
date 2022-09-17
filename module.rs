@@ -2,18 +2,11 @@ use std::fs;
 use std::path::Path;
 use std::pin::Pin;
 
-use std::cmp::min;
-use std::fs::File;
-use std::io::Write;
-
 use crate::download::download_luwak_module;
-use http_cache_reqwest::{CACacheManager, Cache, CacheMode, HttpCache};
-use reqwest::Client;
-use reqwest_middleware::ClientBuilder;
 
 use data_url::DataUrl;
 use deno_ast::{MediaType, ParseParams, SourceTextInfo};
-use deno_core::anyhow::{anyhow, bail, Error};
+use deno_core::anyhow::{bail, Error};
 use deno_core::futures::FutureExt;
 use deno_core::resolve_import;
 use deno_core::url::Url;
@@ -48,7 +41,7 @@ impl ModuleLoader for LuwakModule {
                 "node" | "http" | "https" | "file" => {
                     let luwak_path = Path::new(env!("HOME")).join(".luwak/modules");
                     if !luwak_path.exists() {
-                        fs::create_dir_all(&luwak_path);
+                        fs::create_dir_all(&luwak_path).unwrap();
                     }
                     let module_url = Url::parse(module_specifier.as_str()).unwrap();
                     let module_url_path = luwak_path.join(
@@ -70,7 +63,7 @@ impl ModuleLoader for LuwakModule {
 
                     //println!("DEBUG file {}", module_specifier.as_str());
                     if !module_url_path.exists() && module_specifier.scheme() != "file" {
-                        fs::create_dir_all(module_url_path);
+                        fs::create_dir_all(module_url_path).unwrap();
                     }
 
                     let path;
