@@ -10,8 +10,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: x86_64-pc-windows-gnu
-            archive: zip
+          # - target: x86_64-pc-windows-gnu
+          #   archive: zip
           - target: x86_64-unknown-linux-musl
             archive: tar.gz tar.xz
           - target: x86_64-apple-darwin
@@ -25,3 +25,27 @@ jobs:
         with:
           RUSTTARGET: ${{ matrix.target }}
           ARCHIVE_TYPES: ${{ matrix.archive }}
+
+# name: Luwak main
+
+# on:
+#   push:
+#     branches: [ "main" ]
+#   pull_request:
+#     branches: [ "main" ]
+
+# jobs:
+#   test:
+#     runs-on: ${{ matrix.os }}
+#     strategy:
+#       matrix:
+#         os: [ubuntu-latest, windows-latest, macOS-latest]
+#         rust: [nightly]
+
+#     steps:
+#     - uses: actions/checkout@master
+#     - name: Install Rust
+#       run: |
+#         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain ${{ matrix.rust }}
+#     - name: Run Build
+#       run: cargo -V;cargo build --release
