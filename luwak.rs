@@ -3,43 +3,22 @@ use std::path::Path;
 use std::rc::Rc;
 use std::sync::Arc;
 
-use clap::Parser;
 use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
 use luwaklib::deno_core::anyhow::Result;
 use luwaklib::module::LuwakModule;
 use luwaklib::permissions::Permissions;
 use luwaklib::worker::{MainWorker, WorkerOptions};
 use luwaklib::{deno_core, BootstrapOptions};
+use luwaklib::cli_parser;
 use tokio::runtime::Builder;
 
 use crate::deno_core::error::AnyError;
-
-/// Simple program to greet a person
-#[derive(Parser, Debug)]
-#[clap(author, version, about, long_about = None)]
-struct Args {
-    /// Javascript file location
-    #[clap(value_parser)]
-    js_script: String,
-
-    /// Number of cpu
-    #[clap(short, long, value_parser, default_value_t = std::thread::available_parallelism().map(|p| p.get()).unwrap_or(1))]
-    cpu: usize,
-
-    /// Enable tty
-    #[clap(short, long, value_parser)]
-    tty: bool,
-
-    /// Enable debuging flags
-    #[clap(short, long, value_parser)]
-    debug: bool,
-}
 
 fn get_error_class_name(e: &AnyError) -> &'static str {
     luwaklib::errors::get_error_class_name(e).unwrap_or("Error")
 }
 fn main() -> Result<()> {
-    let args = Args::parse();
+    let args = cli_parser::args();
 
     let module_loader = Rc::new(LuwakModule);
     let create_web_worker_cb = Arc::new(|_| {

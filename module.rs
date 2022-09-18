@@ -44,15 +44,6 @@ impl ModuleLoader for LuwakModule {
                         fs::create_dir_all(&luwak_path).unwrap();
                     }
                     let module_url = Url::parse(module_specifier.as_str()).unwrap();
-                    let module_url_path = luwak_path.join(
-                        module_url
-                            .join("./")
-                            .unwrap()
-                            .as_str()
-                            .replace("https://", "")
-                            .replace("http://", "")
-                            .replace("node://", ""),
-                    );
                     let module_url_file = luwak_path.join(
                         module_url
                             .as_str()
@@ -60,11 +51,6 @@ impl ModuleLoader for LuwakModule {
                             .replace("http://", "")
                             .replace("node://", ""),
                     );
-
-                    //println!("DEBUG file {}", module_specifier.as_str());
-                    if !module_url_path.exists() && module_specifier.scheme() != "file" {
-                        fs::create_dir_all(module_url_path).unwrap();
-                    }
 
                     let path;
                     if module_specifier.scheme() != "file" {
@@ -79,6 +65,12 @@ impl ModuleLoader for LuwakModule {
                             save_file_to = module_url_file;
                         } else {
                             save_file_to = module_url_file.join("index.js");
+                        }
+                        //create module directory
+                        let module_url_path = save_file_to.parent().unwrap();
+                        println!("DEBUG file {}", module_url_path.to_string_lossy());
+                        if !module_url_path.exists() && module_specifier.scheme() != "file" {
+                            fs::create_dir_all(module_url_path).unwrap();
                         }
                         if !save_file_to.exists() {
                             download_luwak_module(
