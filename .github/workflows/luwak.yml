@@ -20,4 +20,4 @@ jobs:
         rust-version: ${{ matrix.rust }}
     - uses: actions/checkout@master
     - name: Run Build
-      run: cargo build --release
+      run: cargo -V;cargo build --release
