@@ -12,7 +12,7 @@ pub async fn download_luwak_module(url: &str, path: &str) -> Result<(), String> 
     println!("Download : {}", url);
     let args = cli_parser::args();
     if args.libdump {
-        let luwak_libs = env::current_dir().unwrap().join("luwaklibs.js");
+        let luwak_libs = env::current_dir().unwrap().join("luwaklibs.lock");
         if !luwak_libs.exists() {
             File::create(luwak_libs.as_path()).or(Err(format!("Failed to create file '{}'", luwak_libs.to_string_lossy())))?;
         }
