@@ -3,13 +3,13 @@ use std::path::Path;
 use std::rc::Rc;
 use std::sync::Arc;
 
+use luwaklib::cli_parser;
 use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
 use luwaklib::deno_core::anyhow::Result;
 use luwaklib::module::LuwakModule;
 use luwaklib::permissions::Permissions;
 use luwaklib::worker::{MainWorker, WorkerOptions};
 use luwaklib::{deno_core, BootstrapOptions};
-use luwaklib::cli_parser;
 use tokio::runtime::Builder;
 
 use crate::deno_core::error::AnyError;

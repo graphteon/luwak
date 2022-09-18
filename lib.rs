@@ -15,6 +15,7 @@ pub use deno_webidl;
 pub use deno_websocket;
 pub use deno_webstorage;
 
+pub mod cli_parser;
 pub mod colors;
 pub mod download;
 pub mod errors;
@@ -27,7 +28,6 @@ pub mod permissions;
 pub mod tokio_util;
 pub mod web_worker;
 pub mod worker;
-pub mod cli_parser;
 
 mod worker_bootstrap;
 pub use worker_bootstrap::BootstrapOptions;
