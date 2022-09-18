@@ -19,7 +19,7 @@ pub struct Args {
     #[clap(short, long, value_parser)]
     pub debug: bool,
 
-    /// Dump libraries to luwak_deps.js
+    /// Dump libraries to luwaklibs.lock
     #[clap(short, long, value_parser)]
     pub libdump: bool,
 }

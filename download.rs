@@ -9,9 +9,9 @@ use crate::cli_parser;
 use std::env;
 
 pub async fn download_luwak_module(url: &str, path: &str) -> Result<(), String> {
-    println!("Download : {}", url);
     let args = cli_parser::args();
     if args.libdump {
+        println!("Download and save to luwaklibs.lock : {}", url);
         let luwak_libs = env::current_dir().unwrap().join("luwaklibs.lock");
         if !luwak_libs.exists() {
             File::create(luwak_libs.as_path()).or(Err(format!("Failed to create file '{}'", luwak_libs.to_string_lossy())))?;
@@ -26,7 +26,9 @@ pub async fn download_luwak_module(url: &str, path: &str) -> Result<(), String> 
             eprintln!("Couldn't write to file: {}", e);
         }
     }
-
+    else{
+        println!("Download : {}", url);
+    }
     let client = Client::new();
     let res = client
         .get(url)
