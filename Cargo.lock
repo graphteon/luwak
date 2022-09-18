@@ -2435,7 +2435,7 @@ dependencies = [
 
 [[package]]
 name = "luwak"
-version = "0.6.0"
+version = "0.6.3"
 dependencies = [
  "async-trait",
  "atty",
