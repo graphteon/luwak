@@ -27,8 +27,8 @@ jobs:
         cargo build --release
         cp target/release/luwak target/release/luwak-${{ matrix.os }}
     - name: Release
-        uses: softprops/action-gh-release@v0.1.14
-        with:
-          files: target/release/luwak-${{ matrix.os }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v0.1.14
+      with:
+        files: target/release/luwak-${{ matrix.os }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
