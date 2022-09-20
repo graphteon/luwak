@@ -6,30 +6,33 @@ all: build
 build: cargo build
 
 release: cargo build --release
+docker:
+	docker buildx create --name luwak --use
+	docker buildx build --push --platform linux/arm/v7,linux/arm64/v8,linux/amd64 --tag orcinus/luwak:$(VERSION) .
 
-docker: dockerbuild dockerbin
+# docker: dockerbuild dockerbin
 
-dockerbuild:
-	rm -rf build
-	for arch in "amd64" "arm32v7" "arm64v8";do \
-		echo "### docker build: builder image $$arch"; \
-		mkdir build; \
-		docker build -t builder -f Dockerfile.build --build-arg ARCH=$$arch .; \
-		echo "### extract odorous"; \
-		docker create --name tmp builder; \
-		docker cp tmp:/src/target/release/luwak build/luwak-$$arch; \
-		docker rm -vf tmp; \
-		docker rmi builder; \
-	done
+# dockerbuild:
+# 	rm -rf build
+# 	for arch in "amd64" "arm32v7" "arm64v8";do \
+# 		echo "### docker build: builder image $$arch"; \
+# 		mkdir build; \
+# 		docker build -t builder -f Dockerfile.build --build-arg ARCH=$$arch .; \
+# 		echo "### extract odorous"; \
+# 		docker create --name tmp builder; \
+# 		docker cp tmp:/src/target/release/luwak build/luwak-$$arch; \
+# 		docker rm -vf tmp; \
+# 		docker rmi builder; \
+# 	done
 
-dockerbin:
-	@echo "add luwak to docker image"
-	for arch in "amd64" "arm32v7" "arm64v8";do \
-		docker build -t $$arch/$(IMAGE):$(VERSION) --build-arg ARCH=$$arch .; \
-		docker tag $$arch/$(IMAGE):$(VERSION) $(IMAGE):latest; \
-		docker push $$arch/$(IMAGE):$(VERSION); \
-		docker push $$arch/$(IMAGE):latest; \
-		docker rmi $$arch/$(IMAGE):$(VERSION); \
-		docker rmi $$arch/$(IMAGE):latest; \
-	done
-	rm -rf build
+# dockerbin:
+# 	@echo "add luwak to docker image"
+# 	for arch in "amd64" "arm32v7" "arm64v8";do \
+# 		docker build -t $$arch/$(IMAGE):$(VERSION) --build-arg ARCH=$$arch .; \
+# 		docker tag $$arch/$(IMAGE):$(VERSION) $(IMAGE):latest; \
+# 		docker push $$arch/$(IMAGE):$(VERSION); \
+# 		docker push $$arch/$(IMAGE):latest; \
+# 		docker rmi $$arch/$(IMAGE):$(VERSION); \
+# 		docker rmi $$arch/$(IMAGE):latest; \
+# 	done
+# 	rm -rf build

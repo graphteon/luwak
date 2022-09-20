@@ -1,6 +1,0 @@
-ARG ARCH=
-FROM ${ARCH}/rust:latest
-
-WORKDIR /src
-COPY . .
-RUN cargo build --release

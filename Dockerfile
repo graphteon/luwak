@@ -1,7 +1,9 @@
-ARG ARCH=
-FROM ${ARCH}/debian:stable-slim
+FROM rust:latest as build
 
-WORKDIR /bin
+WORKDIR /src
+COPY . .
+RUN cargo build --release
+
+FROM debian:stable-slim
+COPY --from=build /src/target/release/luwak /bin/luwak
 RUN apt-get update && apt install -y libssl-dev libc6-dev ca-certificates
-
-ADD build/luwak-${ARCH} .
