@@ -6,9 +6,20 @@ all: build
 build: cargo build
 
 release: cargo build --release
+dockerx:
+	# docker buildx create --name luwak --use
+	docker buildx build --push --platform linux/arm/v7,linux/arm64,linux/amd64 --tag orcinus/luwak:$(VERSION) .
+
+
 docker:
-	docker buildx create --name luwak --use
-	docker buildx build --push --platform linux/arm/v7,linux/arm64/v8,linux/amd64 --tag orcinus/luwak:$(VERSION) .
+	@echo "add luwak to docker image"
+	docker build -t $(IMAGE):$(VERSION) .; \
+	docker tag $(IMAGE):$(VERSION) $(IMAGE):latest; \
+	docker push $(IMAGE):$(VERSION); \
+	docker push $(IMAGE):latest; \
+	docker rmi $(IMAGE):$(VERSION); \
+	docker rmi $(IMAGE):latest;
+	rm -rf build
 
 # docker: dockerbuild dockerbin
 
@@ -28,11 +39,11 @@ docker:
 # dockerbin:
 # 	@echo "add luwak to docker image"
 # 	for arch in "amd64" "arm32v7" "arm64v8";do \
-# 		docker build -t $$arch/$(IMAGE):$(VERSION) --build-arg ARCH=$$arch .; \
-# 		docker tag $$arch/$(IMAGE):$(VERSION) $(IMAGE):latest; \
-# 		docker push $$arch/$(IMAGE):$(VERSION); \
-# 		docker push $$arch/$(IMAGE):latest; \
-# 		docker rmi $$arch/$(IMAGE):$(VERSION); \
-# 		docker rmi $$arch/$(IMAGE):latest; \
+# 		docker build -t $(IMAGE):$(VERSION) --build-arg ARCH=$$arch .; \
+# 		docker tag $(IMAGE):$(VERSION) $(IMAGE):latest; \
+# 		docker push $(IMAGE):$(VERSION); \
+# 		docker push $(IMAGE):latest; \
+# 		docker rmi $(IMAGE):$(VERSION); \
+# 		docker rmi $(IMAGE):latest; \
 # 	done
 # 	rm -rf build
