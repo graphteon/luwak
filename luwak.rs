@@ -1,4 +1,6 @@
 use luwaklib::deno_web::BlobStore;
+use std::fs::{create_dir_all, write, File};
+use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -63,6 +65,24 @@ fn main() -> Result<()> {
         compiled_wasm_module_store: None,
         stdio: Default::default(),
     };
+
+    if args.download != "" {
+        let download_script = format!("#!/bin/bash\nluwak {}", &args.js_script);
+        let download_bin = format!("{}/.luwak/bin", env!("HOME"));
+        let download_path = format!("{}/{}", download_bin, args.download);
+        if !Path::new(&download_bin).exists() {
+            create_dir_all(&download_bin)
+                .expect("Error encountered while creating luwak bin directory!");
+        }
+        if !Path::new(&download_path).exists() {
+            let create_download_file = File::create(&download_path)?;
+            let metadata = create_download_file.metadata()?;
+            let mut perm = metadata.permissions();
+            perm.set_mode(0o755);
+            println!("permissions: {:o}", perm.mode());
+        }
+        write(download_path, download_script).expect("Unable to write luwak file");
+    }
 
     let js_path = Path::new(&args.js_script);
 

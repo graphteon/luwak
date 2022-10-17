@@ -12,16 +12,20 @@ pub struct Args {
     pub cpu: usize,
 
     /// Enable tty
-    #[clap(short, long, value_parser)]
+    #[clap(long, value_parser)]
     pub tty: bool,
 
     /// Enable debuging flags
-    #[clap(short, long, value_parser)]
+    #[clap(long, value_parser)]
     pub debug: bool,
 
     /// Dump libraries to luwaklibs.lock
     #[clap(short, long, value_parser)]
     pub libdump: bool,
+
+    /// Download javascript to bin
+    #[clap(short, long, value_parser, default_value = "")]
+    pub download: String,
 }
 
 pub fn args() -> Args {

@@ -9,7 +9,14 @@ git submodule update --init --recursive
 ```
 
 ## Luwak on ubuntu 22.04
+
 ```
 wget http://nz2.archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
 sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+```
+
+## Download script
+
+```bash
+luwak -d fileserver https://deno.land/std@0.159.0/http/file_server.ts
 ```
