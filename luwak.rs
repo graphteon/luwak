@@ -79,7 +79,6 @@ fn main() -> Result<()> {
             let metadata = create_download_file.metadata()?;
             let mut perm = metadata.permissions();
             perm.set_mode(0o755);
-            println!("permissions: {:o}", perm.mode());
         }
         write(download_path, download_script).expect("Unable to write luwak file");
     }
