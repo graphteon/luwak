@@ -67,7 +67,7 @@ fn main() -> Result<()> {
     };
 
     if args.download != "" {
-        let download_script = format!("#!/bin/bash\nluwak {}", &args.js_script);
+        let download_script = format!("#!/bin/bash\nluwak {} $@", &args.js_script);
         let download_bin = format!("{}/.luwak/bin", env!("HOME"));
         let download_path = format!("{}/{}", download_bin, args.download);
         if !Path::new(&download_bin).exists() {

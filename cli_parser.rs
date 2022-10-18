@@ -7,7 +7,7 @@ pub struct Args {
     #[clap(value_parser)]
     pub js_script: String,
 
-    #[clap(multiple=true)]
+    #[clap(multiple = true, allow_hyphen_values = true)]
     pub js_option: Vec<String>,
 
     /// Number of cpu
