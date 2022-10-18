@@ -75,10 +75,11 @@ fn main() -> Result<()> {
                 .expect("Error encountered while creating luwak bin directory!");
         }
         if !Path::new(&download_path).exists() {
-            let create_download_file = File::create(&download_path)?;
-            let metadata = create_download_file.metadata()?;
+            File::create(&download_path).expect("Unable to create luwak file script");
+            let metadata = std::fs::metadata(&download_path)?;
             let mut perm = metadata.permissions();
             perm.set_mode(0o755);
+            std::fs::set_permissions(&download_path, perm)?;
         }
         write(download_path, download_script).expect("Unable to write luwak file");
     }
