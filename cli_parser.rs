@@ -7,6 +7,9 @@ pub struct Args {
     #[clap(value_parser)]
     pub js_script: String,
 
+    #[clap(multiple=true)]
+    pub js_option: Vec<String>,
+
     /// Number of cpu
     #[clap(short, long, value_parser, default_value_t = std::thread::available_parallelism().map(|p| p.get()).unwrap_or(1))]
     pub cpu: usize,

@@ -32,7 +32,7 @@ fn main() -> Result<()> {
 
     let options = WorkerOptions {
         bootstrap: BootstrapOptions {
-            args: vec![],
+            args: args.js_option,
             cpu_count: args.cpu,
             debug_flag: args.debug,
             enable_testing_features: false,
