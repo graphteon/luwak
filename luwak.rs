@@ -8,8 +8,8 @@ use std::sync::Arc;
 use luwaklib::cli_parser;
 use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
 use luwaklib::deno_core::anyhow::Result;
-use luwaklib::module::LuwakModule;
-use luwaklib::permissions::Permissions;
+//use luwaklib::module::LuwakModule;
+use luwaklib::permissions::PermissionsContainer;
 use luwaklib::worker::{MainWorker, WorkerOptions};
 use luwaklib::{deno_core, BootstrapOptions};
 use tokio::runtime::Builder;
@@ -34,7 +34,7 @@ fn main() -> Result<()> {
         bootstrap: BootstrapOptions {
             args: args.js_option,
             cpu_count: args.cpu,
-            debug_flag: args.debug,
+            //debug_flag: args.debug,
             enable_testing_features: false,
             location: None,
             no_color: false,
@@ -46,20 +46,20 @@ fn main() -> Result<()> {
         },
         extensions: vec![],
         unsafely_ignore_certificate_errors: None,
-        root_cert_store: None,
+        //root_cert_store: None,
         seed: None,
         source_map_getter: None,
         format_js_error_fn: None,
-        web_worker_preload_module_cb: web_worker_event_cb.clone(),
-        web_worker_pre_execute_module_cb: web_worker_event_cb,
+        // web_worker_preload_module_cb: web_worker_event_cb.clone(),
+        // web_worker_pre_execute_module_cb: web_worker_event_cb,
         create_web_worker_cb,
         maybe_inspector_server: None,
         should_break_on_first_statement: false,
-        module_loader,
+        //module_loader,
         npm_resolver: None,
         get_error_class_fn: Some(&get_error_class_name),
         origin_storage_dir: None,
-        blob_store: BlobStore::default(),
+        blob_store: BlobStore::default().into(),
         broadcast_channel: InMemoryBroadcastChannel::default(),
         shared_array_buffer_store: None,
         compiled_wasm_module_store: None,
@@ -87,7 +87,7 @@ fn main() -> Result<()> {
     let js_path = Path::new(&args.js_script);
 
     let main_module = deno_core::resolve_url_or_path(&js_path.to_string_lossy())?;
-    let permissions = Permissions::allow_all();
+    let permissions = PermissionsContainer::allow_all();
 
     let rt = Builder::new_current_thread().enable_all().build()?;
 
