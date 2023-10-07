@@ -20,7 +20,12 @@ fn get_error_class_name(e: &AnyError) -> &'static str {
     luwaklib::errors::get_error_class_name(e).unwrap_or("Error")
 }
 
-#[tokio::main]
+deno_core::extension!(
+    luwak,
+    esm_entry_point = "ext:luwak/init.js",
+    esm = [dir "luwak", "init.js"]
+);
+
 fn main() -> Result<()> {
     let args = cli_parser::args();
 
@@ -47,7 +52,7 @@ fn main() -> Result<()> {
             log_level: Default::default(),
             maybe_binary_npm_command_name: Default::default(),
         },
-        extensions: vec![],
+        extensions: vec![luwak::init_ops_and_esm()],
         unsafely_ignore_certificate_errors: None,
         seed: None,
         source_map_getter: None,

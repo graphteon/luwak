@@ -1,4 +1,5 @@
 const port = 8080;
+const { serve } = Luwak.http;
 
 const handler = (request: Request): Response => {
   const body = `Your user-agent is:\n\n${
@@ -9,4 +10,4 @@ const handler = (request: Request): Response => {
 };
 
 console.log(`HTTP server running. Access it at: http://localhost:8080/`);
-Deno.serve({ port }, handler);
+serve({ port }, handler);

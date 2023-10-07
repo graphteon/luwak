@@ -45,6 +45,7 @@ impl ModuleLoader for LuwakModule {
                         fs::create_dir_all(&luwak_path).unwrap();
                     }
                     let module_url = Url::parse(module_specifier.as_str()).unwrap();
+                    println!("DEBUG module_url {}", module_url.extension());
                     let module_url_file = luwak_path.join(
                         module_url
                             .as_str()
@@ -69,7 +70,7 @@ impl ModuleLoader for LuwakModule {
                         }
                         //create module directory
                         let module_url_path = save_file_to.parent().unwrap();
-                        //println!("DEBUG file {}", module_url_path.to_string_lossy());
+                        println!("DEBUG file {}", module_url_path.to_string_lossy());
                         if !module_url_path.exists() && module_specifier.scheme() != "file" {
                             fs::create_dir_all(module_url_path).unwrap();
                         }
