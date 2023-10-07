@@ -45,7 +45,6 @@ impl ModuleLoader for LuwakModule {
                         fs::create_dir_all(&luwak_path).unwrap();
                     }
                     let module_url = Url::parse(module_specifier.as_str()).unwrap();
-                    println!("DEBUG module_url {}", module_url.extension());
                     let module_url_file = luwak_path.join(
                         module_url
                             .as_str()
@@ -58,7 +57,7 @@ impl ModuleLoader for LuwakModule {
                     if module_specifier.scheme() != "file" {
                         //let module_download = Url::parse(module_specifier.as_str()).unwrap();
                         let module_download_file =
-                            module_url.as_str().replace("node://", "https://esm.sh/");
+                            module_url.as_str().replace("node://", "https://esm.teammayar.workers.dev/");
                         let save_file_to;
                         if module_url_file.extension().unwrap().to_str().unwrap() == "js"
                             || module_url_file.extension().unwrap().to_str().unwrap() == "ts"
@@ -70,7 +69,7 @@ impl ModuleLoader for LuwakModule {
                         }
                         //create module directory
                         let module_url_path = save_file_to.parent().unwrap();
-                        println!("DEBUG file {}", module_url_path.to_string_lossy());
+                        //println!("DEBUG file {}", module_url_path.to_string_lossy());
                         if !module_url_path.exists() && module_specifier.scheme() != "file" {
                             fs::create_dir_all(module_url_path).unwrap();
                         }
