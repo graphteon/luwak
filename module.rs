@@ -15,6 +15,7 @@ use deno_core::ModuleSource;
 use deno_core::ModuleSourceFuture;
 use deno_core::ModuleSpecifier;
 use deno_core::ModuleType;
+use deno_core::ResolutionKind;
 
 pub struct LuwakModule;
 
@@ -23,7 +24,7 @@ impl ModuleLoader for LuwakModule {
         &self,
         specifier: &str,
         referrer: &str,
-        _is_main: bool,
+        _is_main: ResolutionKind,
     ) -> Result<ModuleSpecifier, Error> {
         Ok(resolve_import(specifier, referrer)?)
     }
@@ -31,7 +32,7 @@ impl ModuleLoader for LuwakModule {
     fn load(
         &self,
         module_specifier: &ModuleSpecifier,
-        _maybe_referrer: Option<ModuleSpecifier>,
+        _maybe_referrer: Option<&ModuleSpecifier>,
         _is_dyn_import: bool,
     ) -> Pin<Box<ModuleSourceFuture>> {
         let module_specifier = module_specifier.clone();
@@ -135,16 +136,14 @@ impl ModuleLoader for LuwakModule {
                 maybe_syntax: None,
             })?;
 
-            Ok(ModuleSource {
-                code: parsed
+            Ok(ModuleSource::new_with_redirect(
+                ModuleType::JavaScript,
+                parsed
                     .transpile(&Default::default())?
-                    .text
-                    .into_bytes()
-                    .into_boxed_slice(),
-                module_type: ModuleType::JavaScript,
-                module_url_specified: string_specifier.clone(),
-                module_url_found: string_specifier.clone(),
-            })
+                    .text.into(),
+                    &module_specifier,
+                    &module_specifier,
+              ))
         }
         .boxed_local()
     }

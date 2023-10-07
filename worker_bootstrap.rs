@@ -68,7 +68,7 @@ impl Default for BootstrapOptions {
       .unwrap_or(1);
 
     let runtime_version = env!("CARGO_PKG_VERSION").into();
-    let user_agent = format!("Deno/{runtime_version}");
+    let user_agent = format!("Luwak/{runtime_version}");
 
     Self {
       runtime_version,

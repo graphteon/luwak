@@ -8,7 +8,7 @@ use std::sync::Arc;
 use luwaklib::cli_parser;
 use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
 use luwaklib::deno_core::anyhow::Result;
-//use luwaklib::module::LuwakModule;
+use luwaklib::module::LuwakModule;
 use luwaklib::permissions::PermissionsContainer;
 use luwaklib::worker::{MainWorker, WorkerOptions};
 use luwaklib::{deno_core, BootstrapOptions};
@@ -26,36 +26,34 @@ fn main() -> Result<()> {
     let create_web_worker_cb = Arc::new(|_| {
         todo!("Web workers are not supported");
     });
-    let web_worker_event_cb = Arc::new(|_| {
-        todo!("Web workers are not supported");
-    });
 
     let options = WorkerOptions {
         bootstrap: BootstrapOptions {
             args: args.js_option,
             cpu_count: args.cpu,
-            //debug_flag: args.debug,
+            inspect: args.debug,
             enable_testing_features: false,
             location: None,
             no_color: false,
             is_tty: args.tty,
-            runtime_version: "1.0.0".to_string(),
-            ts_version: "x".to_string(),
+            runtime_version: Default::default(),
+            ts_version: Default::default(),
             unstable: false,
-            user_agent: "luwak".to_string(),
+            user_agent: Default::default(),
+            has_node_modules_dir: true,
+            locale: Default::default(),
+            log_level: Default::default(),
+            maybe_binary_npm_command_name: Default::default()
         },
         extensions: vec![],
         unsafely_ignore_certificate_errors: None,
-        //root_cert_store: None,
         seed: None,
         source_map_getter: None,
         format_js_error_fn: None,
-        // web_worker_preload_module_cb: web_worker_event_cb.clone(),
-        // web_worker_pre_execute_module_cb: web_worker_event_cb,
         create_web_worker_cb,
         maybe_inspector_server: None,
         should_break_on_first_statement: false,
-        //module_loader,
+        module_loader,
         npm_resolver: None,
         get_error_class_fn: Some(&get_error_class_name),
         origin_storage_dir: None,
@@ -64,6 +62,12 @@ fn main() -> Result<()> {
         shared_array_buffer_store: None,
         compiled_wasm_module_store: None,
         stdio: Default::default(),
+        cache_storage_dir: Default::default(),
+        create_params: Default::default(),
+        fs: Arc::new(deno_fs::RealFs),
+        root_cert_store_provider: Default::default(),
+        should_wait_for_inspector_session: Default::default(),
+        startup_snapshot: Default::default(),
     };
 
     if args.download != "" {
