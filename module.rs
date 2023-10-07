@@ -138,12 +138,10 @@ impl ModuleLoader for LuwakModule {
 
             Ok(ModuleSource::new_with_redirect(
                 ModuleType::JavaScript,
-                parsed
-                    .transpile(&Default::default())?
-                    .text.into(),
-                    &module_specifier,
-                    &module_specifier,
-              ))
+                parsed.transpile(&Default::default())?.text.into(),
+                &module_specifier,
+                &module_specifier,
+            ))
         }
         .boxed_local()
     }

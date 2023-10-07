@@ -19,6 +19,8 @@ use crate::deno_core::error::AnyError;
 fn get_error_class_name(e: &AnyError) -> &'static str {
     luwaklib::errors::get_error_class_name(e).unwrap_or("Error")
 }
+
+#[tokio::main]
 fn main() -> Result<()> {
     let args = cli_parser::args();
 
@@ -43,7 +45,7 @@ fn main() -> Result<()> {
             has_node_modules_dir: true,
             locale: Default::default(),
             log_level: Default::default(),
-            maybe_binary_npm_command_name: Default::default()
+            maybe_binary_npm_command_name: Default::default(),
         },
         extensions: vec![],
         unsafely_ignore_certificate_errors: None,
