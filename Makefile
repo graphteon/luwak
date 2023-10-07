@@ -3,9 +3,11 @@ IMAGE="orcinus/luwak"
 
 all: build
 
-build: cargo build
+build: 
+	cargo build
 
-release: cargo build --release
+release: 
+	cargo build --release
 dockerx:
 	# docker buildx create --name luwak --use
 	docker buildx build --push --platform linux/arm/v7,linux/arm64,linux/amd64 --tag orcinus/luwak:$(VERSION) .
