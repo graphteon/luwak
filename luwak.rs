@@ -89,8 +89,9 @@ fn main() -> Result<()> {
     }
 
     let js_path = Path::new(&args.js_script);
+    let cwd = std::env::current_dir().unwrap();
 
-    let main_module = deno_core::resolve_url_or_path(&js_path.to_string_lossy())?;
+    let main_module = deno_core::resolve_url_or_path(&js_path.to_string_lossy(), &cwd)?;
     let permissions = PermissionsContainer::allow_all();
 
     let rt = Builder::new_current_thread().enable_all().build()?;
