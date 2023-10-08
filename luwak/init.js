@@ -1,3 +1,7 @@
+globalThis.Luwak = {
+    version : "0.8.0"
+}
+
 class Context {
     #conn
     #httpConn
@@ -271,14 +275,12 @@ function req(type) {
     }
 }
 
-globalThis.Luwak = {
-    http: {
-        Server,
-        req,
-        res,
-        serve: (ops, handlers) => {
-            Deno.serve(ops, handlers)
-        }
+globalThis.Luwak.http = {
+    Server,
+    req,
+    res,
+    serve: (ops, handlers) => {
+        Deno.serve(ops, handlers)
     }
 }
 

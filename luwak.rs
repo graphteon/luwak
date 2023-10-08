@@ -45,7 +45,7 @@ fn main() -> Result<()> {
             is_tty: args.tty,
             runtime_version: Default::default(),
             ts_version: Default::default(),
-            unstable: false,
+            unstable: true,
             user_agent: Default::default(),
             has_node_modules_dir: true,
             locale: Default::default(),

@@ -1,4 +1,4 @@
 all: build
 
 build: 
-	cat luwak.js flags.js >init.js
+	cat luwak.js http.js flags.js >init.js
