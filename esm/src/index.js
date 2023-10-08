@@ -5,10 +5,13 @@ async function handleRequest(event) {
 	const pathname = url.pathname
 	const search = url.search
 	const pathWithParams = pathname + search
-	let params = pathWithParams.replace("/tools", "")
-	if (params.split("/").length > 2) {
-		params = params.startsWith("@") ? params : "/"+params.split("/").slice(2).join("/");
+	let params = pathWithParams.replace("npm@","@");
+
+	if (params.endsWith("mjs") || params.endsWith("js") || params.endsWith("ts") || params.endsWith("jsx")) {
+		params = "/" + params.split("/").slice(2).join("/");
 	}
+
+	console.log("params", params);
 	return forwardRequest(event, params)
 }
 

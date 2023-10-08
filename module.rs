@@ -39,25 +39,26 @@ impl ModuleLoader for LuwakModule {
         let string_specifier = module_specifier.to_string();
         async move {
             let bytes: _ = match module_specifier.scheme() {
-                "node" | "http" | "https" | "file" => {
+                "node" | "esm" | "http" | "https" | "file" => {
                     let luwak_path = Path::new(env!("HOME")).join(".luwak/modules");
                     if !luwak_path.exists() {
                         fs::create_dir_all(&luwak_path).unwrap();
                     }
                     let module_url = Url::parse(module_specifier.as_str()).unwrap();
+                    //println!("DEBUG module_url {}", module_specifier.as_str());
                     let module_url_file = luwak_path.join(
                         module_url
                             .as_str()
                             .replace("https://", "")
                             .replace("http://", "")
-                            .replace("node://", ""),
+                            .replace("esm://", ""),
                     );
 
                     let path;
                     if module_specifier.scheme() != "file" {
                         //let module_download = Url::parse(module_specifier.as_str()).unwrap();
                         let module_download_file =
-                            module_url.as_str().replace("node://", "https://esm.graphteon.id/");
+                            module_url.as_str().replace("esm://", "https://esm.graphteon.id/");
                         let save_file_to;
                         if module_url_file.extension().unwrap().to_str().unwrap() == "js"
                             || module_url_file.extension().unwrap().to_str().unwrap() == "ts"
@@ -69,7 +70,6 @@ impl ModuleLoader for LuwakModule {
                         }
                         //create module directory
                         let module_url_path = save_file_to.parent().unwrap();
-                        //println!("DEBUG file {}", module_url_path.to_string_lossy());
                         if !module_url_path.exists() && module_specifier.scheme() != "file" {
                             fs::create_dir_all(module_url_path).unwrap();
                         }
@@ -93,7 +93,7 @@ impl ModuleLoader for LuwakModule {
                     bytes
 
                     // let module_url = Url::parse(module_specifier.as_str()).unwrap();
-                    // let module_url_file = module_url.as_str().replace("node://", "https://esm.sh/");
+                    // let module_url_file = module_url.as_str().replace("esm://", "https://esm.sh/");
 
                     // println!("Download : {}", module_url);
 
