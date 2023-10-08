@@ -7,7 +7,7 @@ async function handleRequest(event) {
 	const pathWithParams = pathname + search
 	let params = pathWithParams.replace("/tools", "")
 	if (params.split("/").length > 2) {
-		params = "/"+params.split("/").slice(2).join("/");
+		params = params.startsWith("@") ? params : "/"+params.split("/").slice(2).join("/");
 	}
 	return forwardRequest(event, params)
 }
