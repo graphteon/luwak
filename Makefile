@@ -11,6 +11,10 @@ build: subdirs
 
 release: subdirs
 	cargo build --release
+
+install: release
+	@cp -rf target/release/luwak $HOME/.luwak/bin
+
 dockerx: subdirs
 	# docker buildx create --name luwak --use
 	docker buildx build --push --platform linux/arm/v7,linux/arm64,linux/amd64 --tag orcinus/luwak:$(VERSION) .
