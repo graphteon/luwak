@@ -1,4 +1,4 @@
-const port = 8080;
+const port = 4000;
 const { serve } = Luwak.http;
 
 const handler = (request: Request): Response => {
@@ -9,5 +9,5 @@ const handler = (request: Request): Response => {
   return new Response(body, { status: 200 });
 };
 
-console.log(`HTTP server running. Access it at: http://localhost:8080/`);
+console.log(`HTTP server running. Access it at: http://localhost:${ port }/`);
 serve({ port }, handler);
