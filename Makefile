@@ -13,7 +13,7 @@ release: subdirs
 	cargo build --release
 
 install: release
-	@cp -rf target/release/luwak $HOME/.luwak/bin
+	@cp -rf target/release/luwak $(HOME)/.luwak/bin
 
 dockerx: subdirs
 	# docker buildx create --name luwak --use
