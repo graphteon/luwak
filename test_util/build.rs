@@ -5,7 +5,7 @@ use std::io;
 use std::path::PathBuf;
 
 fn main() -> io::Result<()> {
-  println!("cargo:rerun-if-changed=../ext/kv/proto");
+  println!("cargo:rerun-if-changed=src/kv/proto");
 
   let descriptor_path =
     PathBuf::from(env::var("OUT_DIR").unwrap()).join("proto_descriptor.bin");
@@ -14,8 +14,8 @@ fn main() -> io::Result<()> {
     .file_descriptor_set_path(&descriptor_path)
     .compile_well_known_types()
     .compile_protos(
-      &["../ext/kv/proto/datapath.proto"],
-      &["../ext/kv/proto/"],
+      &["src/kv/proto/datapath.proto"],
+      &["src/kv/proto/"],
     )?;
 
   Ok(())
