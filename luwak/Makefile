@@ -1,4 +1,7 @@
+LUWAKMODULES=`ls src/*.js`
+
 all: build
 
-build: 
-	cat luwak.js http.js flags.js >init.js
+build:
+	@echo "compile luwak module $(LUWAKMODULES)"
+	cat luwak.js $(LUWAKMODULES) >init.js
