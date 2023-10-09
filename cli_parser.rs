@@ -11,7 +11,7 @@ pub struct Args {
     pub js_option: Vec<String>,
 
     /// Number of cpu
-    #[clap(short, long, value_parser, default_value_t = std::thread::available_parallelism().map(|p| p.get()).unwrap_or(1))]
+    #[clap(long, value_parser, default_value_t = std::thread::available_parallelism().map(|p| p.get()).unwrap_or(1))]
     pub cpu: usize,
 
     /// Enable tty
@@ -29,6 +29,10 @@ pub struct Args {
     /// Download javascript to bin
     #[clap(short, long, value_parser, default_value = "")]
     pub download: String,
+
+    /// Dump libraries to luwaklibs.lock
+    #[clap(short, long, value_parser)]
+    pub compile: bool,
 }
 
 pub fn args() -> Args {
