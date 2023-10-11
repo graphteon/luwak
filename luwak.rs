@@ -6,6 +6,7 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 use luwaklib::cli_parser;
+use luwaklib::compile;
 use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
 use luwaklib::deno_core::anyhow::Result;
 use luwaklib::module::LuwakModule;
@@ -104,6 +105,11 @@ fn main() -> Result<()> {
     let rt = Builder::new_current_thread().enable_all().build()?;
 
     let fut = async move {
+        if args.compile {
+            compile::download_latest_binary().await?;
+            std::process::exit(0);
+        }
+
         let mut worker =
             MainWorker::bootstrap_from_options(main_module.clone(), permissions, options);
 

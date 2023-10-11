@@ -1,2 +1,2 @@
-import add from "./lib.js";
+import add from "./libs/lib.js";
 console.log(add(1,2));

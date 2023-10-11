@@ -118,6 +118,9 @@ futures-util = "0.3.14"
 # indicatif = "0.15.0"
 # num_cpus = "1.13.1"
 clap = { version = "3.2.21", features = ["derive"] }
+zip = "0.6.6"
+walkdir = "2.4.0"
+tinyjson = "2.5.1"
 
 [target.'cfg(windows)'.dependencies]
 fwdansi = "1.1.0"

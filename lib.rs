@@ -42,5 +42,6 @@ pub use shared::runtime;
 
 // Luwak module
 pub mod cli_parser;
+pub mod compile;
 pub mod download;
 pub mod module;
