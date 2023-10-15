@@ -61,9 +61,10 @@ impl ModuleLoader for LuwakModule {
                             .as_str()
                             .replace("esm://", "https://esm.graphteon.id/");
                         let save_file_to;
-                        if module_url_file.extension().unwrap().to_str().unwrap() == "js"
+                        if !module_url_file.extension().is_none()
+                            && (module_url_file.extension().unwrap().to_str().unwrap() == "js"
                             || module_url_file.extension().unwrap().to_str().unwrap() == "ts"
-                            || module_url_file.extension().unwrap().to_str().unwrap() == "mjs"
+                            || module_url_file.extension().unwrap().to_str().unwrap() == "mjs")
                         {
                             save_file_to = module_url_file;
                         } else {
