@@ -115,12 +115,15 @@ http-cache-reqwest = "0.5.0"
 async-trait = "0.1.57"
 reqwest = { version = "0.11.3", features = ["stream"] }
 futures-util = "0.3.14"
-# indicatif = "0.15.0"
+indicatif = "0.15.0"
 # num_cpus = "1.13.1"
 clap = { version = "3.2.21", features = ["derive"] }
 zip = "0.6.6"
 walkdir = "2.4.0"
+
+# Luwak libs
 tinyjson = "2.5.1"
+inquire = { version = "0.6.2", default-features = false, features = ["termion", "date"] }
 
 [target.'cfg(windows)'.dependencies]
 fwdansi = "1.1.0"

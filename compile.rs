@@ -1,16 +1,22 @@
+use inquire::Select;
+use notify::Error;
+use reqwest::header::USER_AGENT;
+use reqwest::Client;
+use std::env::temp_dir;
+use std::fs::{set_permissions, File, Permissions};
+use std::io::copy;
 use std::io::prelude::*;
 use std::io::{BufReader, Seek, Write};
 use std::iter::Iterator;
+use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
+use tinyjson::JsonValue;
+use uuid::Uuid;
+use walkdir::{DirEntry, WalkDir};
 use zip::result::ZipError;
 use zip::write::FileOptions;
 
-use std::fs::File;
-use walkdir::{DirEntry, WalkDir};
-
-use reqwest::header::USER_AGENT;
-use reqwest::Client;
-use tinyjson::{JsonParseError, JsonValue};
+use crate::download::luwak_downloader;
 
 const METHOD_STORED: Option<zip::CompressionMethod> = Some(zip::CompressionMethod::Stored);
 
@@ -37,6 +43,64 @@ const METHOD_ZSTD: Option<zip::CompressionMethod> = Some(zip::CompressionMethod:
 #[cfg(not(feature = "zstd"))]
 const METHOD_ZSTD: Option<zip::CompressionMethod> = None;
 
+pub async fn do_pkg(input: &PathBuf, output: &PathBuf) -> Result<(), Error> {
+    let temp_dir = temp_dir();
+    let id = Uuid::new_v4();
+    let work_dir = temp_dir.join(id.to_string());
+    let _ = std::fs::create_dir_all(work_dir.to_str().unwrap());
+
+    // DO Compress file
+    let source_file = work_dir.join("source.zip");
+    if input.is_dir() {
+        zip(&input.to_str().unwrap(), source_file.to_str().unwrap());
+    } else {
+        let _ = zipfile(&input.to_str().unwrap(), source_file.to_str().unwrap());
+    }
+
+    let os_arch = do_select_os();
+    let _ = download_latest_binary(os_arch.unwrap().as_str(), work_dir.to_str().unwrap()).await;
+
+    let _ = add_file_to_zip(
+        work_dir.join("luwak").to_str().unwrap(),
+        source_file.to_str().unwrap(),
+    );
+
+    let mut source_file = File::open(source_file).expect("no such source file");
+    let mut source_buf = Vec::new();
+    source_file
+        .read_to_end(&mut source_buf)
+        .expect("Can't read source file");
+
+    let loader = init_script(input.to_str().unwrap());
+
+    let standalone = [loader, source_buf].concat();
+
+    let mut package_file: File = File::create(output).expect("Unable to create package file!");
+    package_file
+        .write_all(&standalone)
+        .expect("Unable to write data to package file");
+
+    set_permissions(output, Permissions::from_mode(0o770)).unwrap();
+
+    let _ = std::fs::remove_dir_all(work_dir);
+    Ok(())
+}
+
+fn do_select_os() -> Result<String, Error> {
+    let options: Vec<&str> = vec!["Linux - x86_64", "Mac OS - x86_64", "Mac OS - Apple Chip"];
+
+    let choice: &str = Select::new("Select your target operating system?", options)
+        .prompt()
+        .unwrap();
+
+    match choice {
+        "Linux - x86_64" => Ok(String::from("ubuntu")),
+        "Mac OS - x86_64" => Ok(String::from("macOS")),
+        "Mac OS - Apple Chip" => Ok(String::from("macOS-arm64")),
+        _ => panic!("There was an error, please try again"),
+    }
+}
+
 fn init_byte(script: &str) -> Vec<u8> {
     format!(
         r#"
@@ -45,7 +109,8 @@ fn init_byte(script: &str) -> Vec<u8> {
     # commands that you need to do ...
     # ...
     TEMPDIR=`mktemp -d`;
-    unzip -qq $(basename "$0") -d $TEMPDIR &>/dev/null
+    unzip -qq $(dirname "$0")/$(basename "$0") -d $TEMPDIR &>/dev/null
+    chmod +x $TEMPDIR/luwak
     $TEMPDIR/luwak $TEMPDIR/{}
     exit
     "#,
@@ -80,7 +145,7 @@ fn init_script(script_path: &str) -> Vec<u8> {
     init_byte(exe_script.to_str().unwrap())
 }
 
-pub async fn download_latest_binary() -> Result<(), JsonParseError> {
+pub async fn download_latest_binary(os_arch: &str, path: &str) -> Result<(), String> {
     let url = "https://api.github.com/repos/graphteon/luwak/releases/latest";
     let response = Client::new()
         .get(url)
@@ -92,10 +157,42 @@ pub async fn download_latest_binary() -> Result<(), JsonParseError> {
         .await
         .expect("failed to get payload");
     let version: JsonValue = response.parse().unwrap();
-    let version_name = version["name"].clone();
+    let version_name = version["name"].format().unwrap().replace("\"", "");
+    let download_url = format!(
+        r#"https://github.com/graphteon/luwak/releases/download/{}/luwak-{}-latest"#,
+        version_name, os_arch
+    );
+    luwak_downloader(download_url.as_str(), format!("{path}/luwak").as_str()).await
 
-    print!("{:?}", version_name);
+    //Ok(())
+}
 
+fn add_file_to_zip(file: &str, zip_file: &str) -> zip::result::ZipResult<()> {
+    let zip_file_path = Path::new(zip_file);
+    let mut zip_file = std::fs::OpenOptions::new()
+        .write(true)
+        .read(true)
+        .create(true)
+        .open(&zip_file_path)
+        .unwrap();
+    let mut zip = zip::ZipWriter::new_append(&mut zip_file)?;
+    let files_to_compress: Vec<PathBuf> = vec![PathBuf::from(file)];
+    let options = FileOptions::default().compression_method(zip::CompressionMethod::Stored);
+
+    for file_path in &files_to_compress {
+        let file = File::open(file_path)?;
+        let file_name = file_path.file_name().unwrap().to_str().unwrap();
+
+        // Adding the file to the ZIP archive.
+        zip.start_file(file_name, options)?;
+
+        let mut buffer = Vec::new();
+        copy(&mut file.take(u64::MAX), &mut buffer)?;
+
+        zip.write_all(&buffer)?;
+    }
+
+    let _ = zip.finish();
     Ok(())
 }
 

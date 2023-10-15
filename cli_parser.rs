@@ -30,6 +30,10 @@ pub struct Args {
     #[clap(short, long, value_parser, default_value = "")]
     pub download: String,
 
+    /// pkg output
+    #[clap(short, long, value_parser, default_value = "")]
+    pub out: String,
+
     /// Dump libraries to luwaklibs.lock
     #[clap(short, long, value_parser)]
     pub compile: bool,

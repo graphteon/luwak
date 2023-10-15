@@ -1,7 +1,7 @@
 use luwaklib::deno_web::BlobStore;
 use std::fs::{create_dir_all, write, File};
 use std::os::unix::fs::PermissionsExt;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::rc::Rc;
 use std::sync::Arc;
 
@@ -106,7 +106,12 @@ fn main() -> Result<()> {
 
     let fut = async move {
         if args.compile {
-            compile::download_latest_binary().await?;
+            let out = if args.out != "" {
+                PathBuf::from(args.out)
+            } else {
+                std::env::current_dir().unwrap().join("out.bin")
+            };
+            let _ = compile::do_pkg(&js_path.to_path_buf(), &out).await;
             std::process::exit(0);
         }
 
