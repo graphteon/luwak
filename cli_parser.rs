@@ -37,6 +37,10 @@ pub struct Args {
     /// Dump libraries to luwaklibs.lock
     #[clap(short, long, value_parser)]
     pub compile: bool,
+
+    /// Enable debuging flags
+    #[clap(long, value_parser)]
+    pub info: bool,
 }
 
 pub fn args() -> Args {

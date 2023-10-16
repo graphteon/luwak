@@ -13,6 +13,7 @@ use luwaklib::module::LuwakModule;
 use luwaklib::permissions::PermissionsContainer;
 use luwaklib::worker::{MainWorker, WorkerOptions};
 use luwaklib::{deno_core, BootstrapOptions};
+use luwaklib::luwak_util::info;
 use tokio::runtime::Builder;
 
 use crate::deno_core::error::AnyError;
@@ -29,6 +30,11 @@ deno_core::extension!(
 
 fn main() -> Result<()> {
     let args = cli_parser::args();
+
+    if args.info {
+        println!("{}",info().unwrap());
+        std::process::exit(0);
+    }
 
     let module_loader = Rc::new(LuwakModule);
     let create_web_worker_cb = Arc::new(|_| {

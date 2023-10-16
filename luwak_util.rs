@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use dirs::home_dir;
+use dirs::{cache_dir, home_dir};
 use std::env::current_dir;
 use std::fs::create_dir_all;
 
@@ -19,12 +19,23 @@ pub fn luwak_module() -> Option<PathBuf> {
     let luwak_module = if luwak_module_local.exists() {
         luwak_module_local
     } else {
-        home_dir().unwrap().join(LUWAK_DIR).join("modules")
+        cache_dir().unwrap().join("luwak").join("modules")
     };
     if !luwak_module.exists() {
         create_dir_all(&luwak_module).unwrap();
     }
     Some(luwak_module)
+}
+
+pub fn info() -> Option<String> {
+    Some(format!(
+        r#"
+        Luwak Modules : {}
+        Luwak Bin : {}
+    "#,
+        luwak_module().unwrap().to_str().unwrap(),
+        luwak_bin().unwrap().to_str().unwrap()
+    ))
 }
 
 #[cfg(test)]
