@@ -1,5 +1,4 @@
 use std::fs;
-use std::path::Path;
 use std::pin::Pin;
 
 use crate::download::download_luwak_module;
@@ -16,6 +15,8 @@ use deno_core::ModuleSourceFuture;
 use deno_core::ModuleSpecifier;
 use deno_core::ModuleType;
 use deno_core::ResolutionKind;
+
+use crate::luwak_util::luwak_module;
 
 pub struct LuwakModule;
 
@@ -40,10 +41,7 @@ impl ModuleLoader for LuwakModule {
         async move {
             let bytes: _ = match module_specifier.scheme() {
                 "node" | "esm" | "http" | "https" | "file" => {
-                    let luwak_path = Path::new(env!("HOME")).join(".luwak/modules");
-                    if !luwak_path.exists() {
-                        fs::create_dir_all(&luwak_path).unwrap();
-                    }
+                    let luwak_path = luwak_module().unwrap();
                     let module_url = Url::parse(module_specifier.as_str()).unwrap();
                     //println!("DEBUG module_url {}", module_specifier.as_str());
                     let module_url_file = luwak_path.join(
@@ -63,8 +61,8 @@ impl ModuleLoader for LuwakModule {
                         let save_file_to;
                         if !module_url_file.extension().is_none()
                             && (module_url_file.extension().unwrap().to_str().unwrap() == "js"
-                            || module_url_file.extension().unwrap().to_str().unwrap() == "ts"
-                            || module_url_file.extension().unwrap().to_str().unwrap() == "mjs")
+                                || module_url_file.extension().unwrap().to_str().unwrap() == "ts"
+                                || module_url_file.extension().unwrap().to_str().unwrap() == "mjs")
                         {
                             save_file_to = module_url_file;
                         } else {

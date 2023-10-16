@@ -124,6 +124,7 @@ walkdir = "2.4.0"
 # Luwak libs
 tinyjson = "2.5.1"
 inquire = { version = "0.6.2", default-features = false, features = ["termion", "date"] }
+dirs = "5.0.1"
 
 [target.'cfg(windows)'.dependencies]
 fwdansi = "1.1.0"

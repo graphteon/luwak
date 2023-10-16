@@ -37,5 +37,6 @@ cli/tests/.test_coverage/
 build
 
 node_modules
+luwak_modules
 
 out.bin

@@ -341,9 +341,4 @@ mod tests {
             .unwrap()
         );
     }
-
-    #[tokio::test]
-    async fn test_something_async() {
-        let _ = download_latest_binary().await;
-    }
 }
