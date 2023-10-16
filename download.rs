@@ -1,5 +1,5 @@
 // use std::cmp::min;
-use std::fs::{File, OpenOptions};
+use std::fs::File;
 use std::io::Write;
 
 use crate::cli_parser;
@@ -7,28 +7,11 @@ use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::Client;
 use std::cmp::min;
-use std::env;
 
 pub async fn download_luwak_module(url: &str, path: &str) -> Result<(), String> {
     let args = cli_parser::args();
     if args.libdump {
-        println!("Download and save to luwaklibs.lock : {}", url);
-        let luwak_libs = env::current_dir().unwrap().join("luwaklibs.lock");
-        if !luwak_libs.exists() {
-            File::create(luwak_libs.as_path()).or(Err(format!(
-                "Failed to create file '{}'",
-                luwak_libs.to_string_lossy()
-            )))?;
-        }
-        let mut luwak_libs_file = OpenOptions::new()
-            .write(true)
-            .append(true)
-            .open(luwak_libs.as_path())
-            .unwrap();
-
-        if let Err(e) = writeln!(luwak_libs_file, "export * from '{}';", url) {
-            eprintln!("Couldn't write to file: {}", e);
-        }
+        println!("Dump deps to luwak_modules : {}", url);
     } else {
         println!("Download : {}", url);
     }
@@ -53,27 +36,6 @@ pub async fn download_luwak_module(url: &str, path: &str) -> Result<(), String> 
 }
 
 pub async fn luwak_downloader(url: &str, path: &str) -> Result<(), String> {
-    let args = cli_parser::args();
-    if args.libdump {
-        println!("Download and save to luwaklibs.lock : {}", url);
-        let luwak_libs = env::current_dir().unwrap().join("luwaklibs.lock");
-        if !luwak_libs.exists() {
-            File::create(luwak_libs.as_path()).or(Err(format!(
-                "Failed to create file '{}'",
-                luwak_libs.to_string_lossy()
-            )))?;
-        }
-        let mut luwak_libs_file = OpenOptions::new()
-            .write(true)
-            .append(true)
-            .open(luwak_libs.as_path())
-            .unwrap();
-
-        if let Err(e) = writeln!(luwak_libs_file, "export * from '{}';", url) {
-            eprintln!("Couldn't write to file: {}", e);
-        }
-    }
-
     let client = Client::new();
     let res = client
         .get(url)

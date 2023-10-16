@@ -9,7 +9,7 @@ use luwaklib::cli_parser;
 use luwaklib::compile;
 use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
 use luwaklib::deno_core::anyhow::Result;
-use luwaklib::luwak_util::{info, init};
+use luwaklib::luwak_util::{info, init, dump_luwak_module_path};
 use luwaklib::module::LuwakModule;
 use luwaklib::permissions::PermissionsContainer;
 use luwaklib::worker::{MainWorker, WorkerOptions};
@@ -39,6 +39,11 @@ fn main() -> Result<()> {
     if args.init {
         init();
         std::process::exit(0);
+    }
+
+    if args.libdump {
+        println!("🚀 All dependencies will be stored in the luwak_module directory...");
+        dump_luwak_module_path().unwrap();
     }
 
     let module_loader = Rc::new(LuwakModule);

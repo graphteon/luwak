@@ -22,7 +22,7 @@ pub struct Args {
     #[clap(long, value_parser)]
     pub debug: bool,
 
-    /// Dump libraries to luwaklibs.lock
+    /// All dependencies will be stored in the luwak_module directory
     #[clap(short, long, value_parser)]
     pub libdump: bool,
 
@@ -34,7 +34,7 @@ pub struct Args {
     #[clap(short, long, value_parser, default_value = "")]
     pub out: String,
 
-    /// Dump libraries to luwaklibs.lock
+    /// Package your library to standalone binary
     #[clap(short, long, value_parser)]
     pub compile: bool,
 
