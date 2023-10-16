@@ -19,7 +19,13 @@ pub fn luwak_bin() -> Option<PathBuf> {
 }
 
 pub fn luwak_module() -> Option<PathBuf> {
-    let luwak_module_local = current_dir().unwrap().join("luwak_modules");
+    let args = cli_parser::args();
+    let luwak_module_local = PathBuf::from(current_dir().unwrap().to_str().unwrap())
+        .join(&args.js_script.as_str())
+        .parent()
+        .unwrap()
+        .to_path_buf()
+        .join("luwak_modules");
     let luwak_module = if luwak_module_local.exists() {
         luwak_module_local
     } else {

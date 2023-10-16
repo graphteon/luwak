@@ -9,7 +9,7 @@ use luwaklib::cli_parser;
 use luwaklib::compile;
 use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
 use luwaklib::deno_core::anyhow::Result;
-use luwaklib::luwak_util::{info, init, dump_luwak_module_path};
+use luwaklib::luwak_util::{dump_luwak_module_path, info, init};
 use luwaklib::module::LuwakModule;
 use luwaklib::permissions::PermissionsContainer;
 use luwaklib::worker::{MainWorker, WorkerOptions};
