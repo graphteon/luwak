@@ -9,11 +9,11 @@ use luwaklib::cli_parser;
 use luwaklib::compile;
 use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
 use luwaklib::deno_core::anyhow::Result;
+use luwaklib::luwak_util::{info, init};
 use luwaklib::module::LuwakModule;
 use luwaklib::permissions::PermissionsContainer;
 use luwaklib::worker::{MainWorker, WorkerOptions};
 use luwaklib::{deno_core, BootstrapOptions};
-use luwaklib::luwak_util::info;
 use tokio::runtime::Builder;
 
 use crate::deno_core::error::AnyError;
@@ -32,7 +32,12 @@ fn main() -> Result<()> {
     let args = cli_parser::args();
 
     if args.info {
-        println!("{}",info().unwrap());
+        println!("{}", info().unwrap());
+        std::process::exit(0);
+    }
+
+    if args.init {
+        init();
         std::process::exit(0);
     }
 

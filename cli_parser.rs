@@ -41,6 +41,10 @@ pub struct Args {
     /// Enable debuging flags
     #[clap(long, value_parser)]
     pub info: bool,
+
+    /// create new luwak apps
+    #[clap(long, value_parser)]
+    pub init: bool,
 }
 
 pub fn args() -> Args {
