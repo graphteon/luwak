@@ -38,6 +38,11 @@ pub fn info() -> Option<String> {
     ))
 }
 
+pub fn init() -> Option<()> {
+    
+    Some(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
