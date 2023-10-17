@@ -1,17 +1,27 @@
 VERSION=`cat Cargo.toml|grep "version ="|head -n 1|sed 's|version = ||g'|sed 's|"||g'`
 IMAGE="orcinus/luwak"
 
-all: build
+all: subdirs release
 
-build: cargo build
+subdirs:
+	 $(MAKE) -C luwak
 
-release: cargo build --release
-dockerx:
+build: subdirs
+	cargo build
+
+release: subdirs
+	@cargo fmt
+	@cargo build --release
+
+install: release
+	@cp -rf target/release/luwak $(HOME)/.luwak/bin
+
+dockerx: subdirs
 	# docker buildx create --name luwak --use
 	docker buildx build --push --platform linux/arm/v7,linux/arm64,linux/amd64 --tag orcinus/luwak:$(VERSION) .
 
 
-docker:
+docker: subdirs
 	@echo "add luwak to docker image"
 	docker build -t $(IMAGE):$(VERSION) .; \
 	docker tag $(IMAGE):$(VERSION) $(IMAGE):latest; \

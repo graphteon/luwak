@@ -1,72 +1,39 @@
+// Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+
+mod shared;
+
 use std::env;
-use std::path::Path;
 use std::path::PathBuf;
 
-// This is a shim that allows to generate documentation on docs.rs
-#[cfg(not(feature = "docsrs"))]
-mod not_docs {
+#[cfg(all(not(feature = "docsrs"), not(feature = "dont_create_runtime_snapshot")))]
+mod startup_snapshot {
     use super::*;
+    use deno_cache::SqliteBackedCache;
+    use deno_core::error::AnyError;
+    use deno_core::snapshot_util::*;
     use deno_core::Extension;
-    use deno_core::JsRuntime;
-    use deno_core::RuntimeOptions;
+    use deno_http::DefaultHttpPropertyExtractor;
+    use shared::maybe_transpile_source;
+    use shared::runtime;
+    use std::path::Path;
 
-    // TODO(bartlomieju): this module contains a lot of duplicated
-    // logic with `cli/build.rs`, factor out to `deno_core`.
-    fn create_snapshot(mut js_runtime: JsRuntime, snapshot_path: &Path, files: Vec<PathBuf>) {
-        // TODO(nayeemrmn): https://github.com/rust-lang/cargo/issues/3946 to get the
-        // workspace root.
-        let display_root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
-        for file in files {
-            println!("cargo:rerun-if-changed={}", file.display());
-            let display_path = file.strip_prefix(display_root).unwrap();
-            let display_path_str = display_path.display().to_string();
-            js_runtime
-                .execute_script(
-                    &("deno:".to_string() + &display_path_str.replace('\\', "/")),
-                    &std::fs::read_to_string(&file).unwrap(),
-                )
-                .unwrap();
-        }
-
-        let snapshot = js_runtime.snapshot();
-        let snapshot_slice: &[u8] = &*snapshot;
-        println!("Snapshot size: {}", snapshot_slice.len());
-
-        let compressed_snapshot_with_size = {
-            let mut vec = vec![];
-
-            vec.extend_from_slice(
-                &u32::try_from(snapshot.len())
-                    .expect("snapshot larger than 4gb")
-                    .to_le_bytes(),
-            );
-
-            lzzzz::lz4_hc::compress_to_vec(snapshot_slice, &mut vec, lzzzz::lz4_hc::CLEVEL_MAX)
-                .expect("snapshot compression failed");
-
-            vec
-        };
-
-        println!(
-            "Snapshot compressed size: {}",
-            compressed_snapshot_with_size.len()
-        );
-
-        std::fs::write(&snapshot_path, compressed_snapshot_with_size).unwrap();
-        println!("Snapshot written to: {} ", snapshot_path.display());
-    }
-
+    #[derive(Clone)]
     struct Permissions;
 
     impl deno_fetch::FetchPermissions for Permissions {
         fn check_net_url(
             &mut self,
             _url: &deno_core::url::Url,
+            _api_name: &str,
         ) -> Result<(), deno_core::error::AnyError> {
             unreachable!("snapshotting!")
         }
 
-        fn check_read(&mut self, _p: &Path) -> Result<(), deno_core::error::AnyError> {
+        fn check_read(
+            &mut self,
+            _p: &Path,
+            _api_name: &str,
+        ) -> Result<(), deno_core::error::AnyError> {
             unreachable!("snapshotting!")
         }
     }
@@ -75,6 +42,7 @@ mod not_docs {
         fn check_net_url(
             &mut self,
             _url: &deno_core::url::Url,
+            _api_name: &str,
         ) -> Result<(), deno_core::error::AnyError> {
             unreachable!("snapshotting!")
         }
@@ -91,22 +59,36 @@ mod not_docs {
     }
 
     impl deno_ffi::FfiPermissions for Permissions {
-        fn check(&mut self, _path: Option<&Path>) -> Result<(), deno_core::error::AnyError> {
-            unreachable!("snapshotting!")
-        }
-    }
-
-    impl deno_flash::FlashPermissions for Permissions {
-        fn check_net<T: AsRef<str>>(
+        fn check_partial(
             &mut self,
-            _host: &(T, Option<u16>),
+            _path: Option<&Path>,
         ) -> Result<(), deno_core::error::AnyError> {
             unreachable!("snapshotting!")
         }
     }
 
+    impl deno_napi::NapiPermissions for Permissions {
+        fn check(&mut self, _path: Option<&Path>) -> Result<(), deno_core::error::AnyError> {
+            unreachable!("snapshotting!")
+        }
+    }
+
     impl deno_node::NodePermissions for Permissions {
-        fn check_read(&mut self, _p: &Path) -> Result<(), deno_core::error::AnyError> {
+        fn check_net_url(
+            &mut self,
+            _url: &deno_core::url::Url,
+            _api_name: &str,
+        ) -> Result<(), deno_core::error::AnyError> {
+            unreachable!("snapshotting!")
+        }
+        fn check_read(&self, _p: &Path) -> Result<(), deno_core::error::AnyError> {
+            unreachable!("snapshotting!")
+        }
+        fn check_sys(
+            &self,
+            _kind: &str,
+            _api_name: &str,
+        ) -> Result<(), deno_core::error::AnyError> {
             unreachable!("snapshotting!")
         }
     }
@@ -115,70 +97,141 @@ mod not_docs {
         fn check_net<T: AsRef<str>>(
             &mut self,
             _host: &(T, Option<u16>),
+            _api_name: &str,
         ) -> Result<(), deno_core::error::AnyError> {
             unreachable!("snapshotting!")
         }
 
-        fn check_read(&mut self, _p: &Path) -> Result<(), deno_core::error::AnyError> {
+        fn check_read(
+            &mut self,
+            _p: &Path,
+            _api_name: &str,
+        ) -> Result<(), deno_core::error::AnyError> {
             unreachable!("snapshotting!")
         }
 
-        fn check_write(&mut self, _p: &Path) -> Result<(), deno_core::error::AnyError> {
+        fn check_write(
+            &mut self,
+            _p: &Path,
+            _api_name: &str,
+        ) -> Result<(), deno_core::error::AnyError> {
             unreachable!("snapshotting!")
         }
     }
 
-    fn create_runtime_snapshot(snapshot_path: &Path, files: Vec<PathBuf>) {
-        let extensions: Vec<Extension> = vec![
-            deno_webidl::init(),
-            deno_console::init(),
-            deno_url::init(),
-            deno_tls::init(),
-            deno_web::init::<Permissions>(deno_web::BlobStore::default(), Default::default()),
-            deno_fetch::init::<Permissions>(Default::default()),
-            deno_websocket::init::<Permissions>("".to_owned(), None, None),
-            deno_webstorage::init(None),
-            deno_crypto::init(None),
-            deno_webgpu::init(false),
-            deno_broadcast_channel::init(
+    impl deno_fs::FsPermissions for Permissions {
+        fn check_read(&mut self, _path: &Path, _api_name: &str) -> Result<(), AnyError> {
+            unreachable!("snapshotting!")
+        }
+
+        fn check_read_all(&mut self, _api_name: &str) -> Result<(), AnyError> {
+            unreachable!("snapshotting!")
+        }
+
+        fn check_read_blind(
+            &mut self,
+            _path: &Path,
+            _display: &str,
+            _api_name: &str,
+        ) -> Result<(), AnyError> {
+            unreachable!("snapshotting!")
+        }
+
+        fn check_write(&mut self, _path: &Path, _api_name: &str) -> Result<(), AnyError> {
+            unreachable!("snapshotting!")
+        }
+
+        fn check_write_partial(&mut self, _path: &Path, _api_name: &str) -> Result<(), AnyError> {
+            unreachable!("snapshotting!")
+        }
+
+        fn check_write_all(&mut self, _api_name: &str) -> Result<(), AnyError> {
+            unreachable!("snapshotting!")
+        }
+
+        fn check_write_blind(
+            &mut self,
+            _path: &Path,
+            _display: &str,
+            _api_name: &str,
+        ) -> Result<(), AnyError> {
+            unreachable!("snapshotting!")
+        }
+    }
+
+    impl deno_kv::sqlite::SqliteDbHandlerPermissions for Permissions {
+        fn check_read(&mut self, _path: &Path, _api_name: &str) -> Result<(), AnyError> {
+            unreachable!("snapshotting!")
+        }
+
+        fn check_write(&mut self, _path: &Path, _api_name: &str) -> Result<(), AnyError> {
+            unreachable!("snapshotting!")
+        }
+    }
+
+    pub fn create_runtime_snapshot(snapshot_path: PathBuf) {
+        // NOTE(bartlomieju): ordering is important here, keep it in sync with
+        // `runtime/worker.rs`, `runtime/web_worker.rs` and `cli/build.rs`!
+        let fs = std::sync::Arc::new(deno_fs::RealFs);
+        let mut extensions: Vec<Extension> = vec![
+            deno_webidl::deno_webidl::init_ops_and_esm(),
+            deno_console::deno_console::init_ops_and_esm(),
+            deno_url::deno_url::init_ops_and_esm(),
+            deno_web::deno_web::init_ops_and_esm::<Permissions>(
+                Default::default(),
+                Default::default(),
+            ),
+            deno_fetch::deno_fetch::init_ops_and_esm::<Permissions>(Default::default()),
+            deno_cache::deno_cache::init_ops_and_esm::<SqliteBackedCache>(None),
+            deno_websocket::deno_websocket::init_ops_and_esm::<Permissions>(
+                "".to_owned(),
+                None,
+                None,
+            ),
+            deno_webstorage::deno_webstorage::init_ops_and_esm(None),
+            deno_crypto::deno_crypto::init_ops_and_esm(None),
+            deno_broadcast_channel::deno_broadcast_channel::init_ops_and_esm(
                 deno_broadcast_channel::InMemoryBroadcastChannel::default(),
                 false, // No --unstable.
             ),
-            deno_node::init::<Permissions>(false, None), // No --unstable.
-            deno_ffi::init::<Permissions>(false),
-            deno_net::init::<Permissions>(
+            deno_ffi::deno_ffi::init_ops_and_esm::<Permissions>(false),
+            deno_net::deno_net::init_ops_and_esm::<Permissions>(
                 None, false, // No --unstable.
                 None,
             ),
-            deno_http::init(),
-            deno_flash::init::<Permissions>(false), // No --unstable
+            deno_tls::deno_tls::init_ops_and_esm(),
+            deno_kv::deno_kv::init_ops_and_esm(
+                deno_kv::sqlite::SqliteDbHandler::<Permissions>::new(None),
+                false, // No --unstable
+            ),
+            deno_napi::deno_napi::init_ops_and_esm::<Permissions>(),
+            deno_http::deno_http::init_ops_and_esm::<DefaultHttpPropertyExtractor>(),
+            deno_io::deno_io::init_ops_and_esm(Default::default()),
+            deno_fs::deno_fs::init_ops_and_esm::<Permissions>(false, fs.clone()),
+            deno_node::deno_node::init_ops_and_esm::<Permissions>(None, fs),
+            runtime::init_ops_and_esm(),
         ];
 
-        let js_runtime = JsRuntime::new(RuntimeOptions {
-            will_snapshot: true,
+        for extension in &mut extensions {
+            for source in extension.esm_files.to_mut() {
+                maybe_transpile_source(source).unwrap();
+            }
+            for source in extension.js_files.to_mut() {
+                maybe_transpile_source(source).unwrap();
+            }
+        }
+
+        let output = create_snapshot(CreateSnapshotOptions {
+            cargo_manifest_dir: env!("CARGO_MANIFEST_DIR"),
+            snapshot_path,
+            startup_snapshot: None,
             extensions,
-            ..Default::default()
+            compression_cb: None,
+            with_runtime_cb: None,
         });
-        create_snapshot(js_runtime, snapshot_path, files);
-    }
-
-    fn get_js_files(d: &str) -> Vec<PathBuf> {
-        let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
-        let mut js_files = std::fs::read_dir(d)
-            .unwrap()
-            .map(|dir_entry| {
-                let file = dir_entry.unwrap();
-                manifest_dir.join(file.path())
-            })
-            .filter(|path| path.extension().unwrap_or_default() == "js")
-            .collect::<Vec<PathBuf>>();
-        js_files.sort();
-        js_files
-    }
-
-    pub fn build_snapshot(runtime_snapshot_path: PathBuf) {
-        let js_files = get_js_files("js");
-        create_runtime_snapshot(&runtime_snapshot_path, js_files);
+        for path in output.files_loaded_during_snapshot {
+            println!("cargo:rerun-if-changed={}", path.display());
+        }
     }
 }
 
@@ -191,17 +244,18 @@ fn main() {
     let o = PathBuf::from(env::var_os("OUT_DIR").unwrap());
 
     // Main snapshot
-    let runtime_snapshot_path = o.join("CLI_SNAPSHOT.bin");
+    let runtime_snapshot_path = o.join("RUNTIME_SNAPSHOT.bin");
 
     // If we're building on docs.rs we just create
     // and empty snapshot file and return, because `rusty_v8`
     // doesn't actually compile on docs.rs
     if env::var_os("DOCS_RS").is_some() {
         let snapshot_slice = &[];
+        #[allow(clippy::needless_borrow)]
+        #[allow(clippy::disallowed_methods)]
         std::fs::write(&runtime_snapshot_path, snapshot_slice).unwrap();
-        return;
     }
 
-    #[cfg(not(feature = "docsrs"))]
-    not_docs::build_snapshot(runtime_snapshot_path)
+    #[cfg(all(not(feature = "docsrs"), not(feature = "dont_create_runtime_snapshot")))]
+    startup_snapshot::create_runtime_snapshot(runtime_snapshot_path)
 }

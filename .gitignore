@@ -35,3 +35,8 @@ cli/tests/.test_coverage/
 /tools/wpt/certs/index.txt*
 /tools/wpt/certs/serial*
 build
+
+node_modules
+luwak_modules
+
+out.bin
