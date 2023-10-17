@@ -24,7 +24,7 @@ pub struct Args {
 
     /// All dependencies will be stored in the luwak_module directory
     #[clap(short, long, value_parser)]
-    pub libdump: bool,
+    pub install: bool,
 
     /// Download javascript to bin
     #[clap(short, long, value_parser, default_value = "")]

@@ -41,7 +41,7 @@ fn main() -> Result<()> {
         std::process::exit(0);
     }
 
-    if args.libdump {
+    if args.install {
         println!("🚀 All dependencies will be stored in the luwak_module directory...");
         dump_luwak_module_path().unwrap();
     }

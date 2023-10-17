@@ -52,6 +52,24 @@ pub fn dump_luwak_module_path() -> Option<PathBuf> {
     Some(luwak_module)
 }
 
+pub fn luwak_script_dir() -> Option<PathBuf> {
+    let args = cli_parser::args();
+    let luwak_script = if PathBuf::from(current_dir().unwrap().to_str().unwrap())
+        .join(&args.js_script.as_str())
+        .is_file()
+    {
+        PathBuf::from(current_dir().unwrap().to_str().unwrap())
+            .join(&args.js_script.as_str())
+            .parent()
+            .unwrap()
+            .to_path_buf()
+    } else {
+        PathBuf::from(current_dir().unwrap().to_str().unwrap()).join(&args.js_script.as_str())
+    };
+
+    Some(luwak_script)
+}
+
 pub fn info() -> Option<String> {
     Some(format!(
         r#"

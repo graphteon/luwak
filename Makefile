@@ -10,7 +10,8 @@ build: subdirs
 	cargo build
 
 release: subdirs
-	cargo build --release
+	@cargo fmt
+	@cargo build --release
 
 install: release
 	@cp -rf target/release/luwak $(HOME)/.luwak/bin
