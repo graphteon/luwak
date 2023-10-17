@@ -41,9 +41,13 @@ fn main() -> Result<()> {
         std::process::exit(0);
     }
 
-    if args.install {
-        println!("🚀 All dependencies will be stored in the luwak_module directory...");
+    if args.local {
         dump_luwak_module_path().unwrap();
+        println!("🚀 Create luwak_modules to your project directory...");
+    }
+
+    if args.install {
+        println!("🚀 All dependencies will be freezed to the luwaklibs.lock file,\nyou can install dependencies with `luwak -i luwaklibs.lock` later...");
     }
 
     let module_loader = Rc::new(LuwakModule);

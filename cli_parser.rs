@@ -26,11 +26,15 @@ pub struct Args {
     #[clap(short, long, value_parser)]
     pub install: bool,
 
+    /// Create luwak_modules directory
+    #[clap(short, long, value_parser)]
+    pub local: bool,
+
     /// Download javascript to bin
     #[clap(short, long, value_parser, default_value = "")]
     pub download: String,
 
-    /// pkg output
+    /// Standalone binary output
     #[clap(short, long, value_parser, default_value = "")]
     pub out: String,
 
@@ -42,7 +46,7 @@ pub struct Args {
     #[clap(long, value_parser)]
     pub info: bool,
 
-    /// create new luwak apps
+    /// Create and initilize new luwak apps
     #[clap(long, value_parser)]
     pub init: bool,
 }
