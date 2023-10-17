@@ -110,9 +110,7 @@ fn init_byte(script: &str) -> Vec<u8> {
     # ...
     TEMPDIR=`mktemp -d`;
     unzip -qq $(dirname "$0")/$(basename "$0") -d $TEMPDIR &>/dev/null
-    chmod +x $TEMPDIR/luwak
-    cd $TEMPDIR
-    ./luwak ./{}
+    chmod +x $TEMPDIR/luwak && cd $TEMPDIR && $TEMPDIR/luwak ./{}
     exit
     "#,
         script
