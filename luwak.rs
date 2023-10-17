@@ -42,7 +42,10 @@ fn main() -> Result<()> {
     }
 
     if args.install {
-        println!("🚀 All dependencies will be freezed to the luwaklibs.lock file,\nyou can install dependencies with `luwak -i luwaklibs.lock` later...");
+        println!(
+            "🚀 All dependencies will be freezed to the luwaklibs.lock file,
+        \nyou can install dependencies with `luwak -i luwaklibs.lock` later..."
+        );
         dump_luwak_module_path().unwrap();
     }
 
