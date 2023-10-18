@@ -58,9 +58,17 @@ impl ModuleLoader for LuwakModule {
                     let path;
                     if module_specifier.scheme() != "file" {
                         //let module_download = Url::parse(module_specifier.as_str()).unwrap();
-                        let module_download_file = module_url
-                            .as_str()
-                            .replace("npm://", "https://esm.graphteon.id/");
+                        let module_download_file = if module_url.as_str().contains("github.com") {
+                            module_url
+                                .as_str()
+                                .replace("github.com", "raw.githubusercontent.com")
+                                .replace("blob/", "")
+                        } else {
+                            module_url
+                                .as_str()
+                                .replace("npm://", "https://esm.graphteon.id/")
+                        };
+
                         let save_file_to;
                         if !module_url_file.extension().is_none()
                             && (module_url_file.extension().unwrap().to_str().unwrap() == "js"

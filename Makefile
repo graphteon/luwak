@@ -3,6 +3,9 @@ IMAGE="orcinus/luwak"
 
 all: subdirs release
 
+dev: subdirs release
+	cp target/release/luwak $(HOME)/.luwak/bin/luwak
+
 subdirs:
 	 $(MAKE) -C luwak
 

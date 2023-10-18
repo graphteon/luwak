@@ -1,4 +1,4 @@
-import { parseHTML } from "esm://linkedom@0.15.4";
+import { parseHTML } from "npm:linkedom@0.15.4";
 
 const { document, customElements, HTMLElement } = parseHTML(`<!DOCTYPE html>
   <html lang="en">
