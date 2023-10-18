@@ -1,5 +1,5 @@
 const port = 4000;
-const { serve } = Luwak.http;
+const { serve } = Luwak();
 
 const handler = (request: Request): Response => {
   const body = `Your user-agent is:\n\n${

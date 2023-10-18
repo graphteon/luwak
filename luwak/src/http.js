@@ -274,9 +274,6 @@ function req(type) {
 globalThis.Luwak.http = {
     Server,
     req,
-    res,
-    serve: (ops, handlers) => {
-        Deno.serve(ops, handlers)
-    }
+    res
 }
 

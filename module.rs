@@ -27,7 +27,10 @@ impl ModuleLoader for LuwakModule {
         referrer: &str,
         _is_main: ResolutionKind,
     ) -> Result<ModuleSpecifier, Error> {
-        Ok(resolve_import(specifier, referrer)?)
+        Ok(resolve_import(
+            specifier.replace("npm:", "npm://").as_str(),
+            referrer,
+        )?)
     }
 
     fn load(
@@ -40,7 +43,7 @@ impl ModuleLoader for LuwakModule {
         let string_specifier = module_specifier.to_string();
         async move {
             let bytes: _ = match module_specifier.scheme() {
-                "node" | "esm" | "http" | "https" | "file" => {
+                "node" | "npm" | "http" | "https" | "file" => {
                     let luwak_path = luwak_module().unwrap();
                     let module_url = Url::parse(module_specifier.as_str()).unwrap();
                     //println!("DEBUG module_url {}", module_specifier.as_str());
@@ -49,15 +52,23 @@ impl ModuleLoader for LuwakModule {
                             .as_str()
                             .replace("https://", "")
                             .replace("http://", "")
-                            .replace("esm://", ""),
+                            .replace("npm://", ""),
                     );
 
                     let path;
                     if module_specifier.scheme() != "file" {
                         //let module_download = Url::parse(module_specifier.as_str()).unwrap();
-                        let module_download_file = module_url
-                            .as_str()
-                            .replace("esm://", "https://esm.graphteon.id/");
+                        let module_download_file = if module_url.as_str().contains("github.com") {
+                            module_url
+                                .as_str()
+                                .replace("github.com", "raw.githubusercontent.com")
+                                .replace("blob/", "")
+                        } else {
+                            module_url
+                                .as_str()
+                                .replace("npm://", "https://esm.graphteon.id/")
+                        };
+
                         let save_file_to;
                         if !module_url_file.extension().is_none()
                             && (module_url_file.extension().unwrap().to_str().unwrap() == "js"
@@ -91,18 +102,6 @@ impl ModuleLoader for LuwakModule {
 
                     let bytes = tokio::fs::read(path).await?;
                     bytes
-
-                    // let module_url = Url::parse(module_specifier.as_str()).unwrap();
-                    // let module_url_file = module_url.as_str().replace("esm://", "https://esm.sh/");
-
-                    // println!("Download : {}", module_url);
-
-                    // let res = reqwest::get(module_url_file).await?;
-                    // // TODO: The HTML spec says to fail if the status is not
-                    // // 200-299, but `error_for_status()` fails if the status is
-                    // // 400-599.
-                    // let res = res.error_for_status()?;
-                    // res.bytes().await?
                 }
                 "data" => {
                     let url = match DataUrl::process(module_specifier.as_str()) {

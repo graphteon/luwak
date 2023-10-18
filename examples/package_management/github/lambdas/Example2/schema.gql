@@ -1,0 +1,7 @@
+extend type Query {
+    getExample2(id: Int!): Example
+    getExamples2(topic: String): [Example]
+}
+extend type Example {
+    test: String
+}
