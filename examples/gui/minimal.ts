@@ -1,4 +1,4 @@
-import { Webview } from "https://deno.land/x/webview/mod.ts";
+import { Webview } from "https://github.com/webview/webview_deno/blob/main/mod.ts";
 
 const html = `
   <html>
