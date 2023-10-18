@@ -1,10 +1,22 @@
-globalThis.Luwak = {
-    readFile : async (path) => {
-        return await Deno.readFile(path);
-    },
-    version : "0.8.0"
+globalThis.Luwak = () => {
+    return Deno;
 }
 
+globalThis.Luwak.version = "0.8.0";
+
+globalThis.require = async (package_name, exports = null) => {
+    const pkg = exports ? `npm:${package_name}?exports=${exports.join(",")}` : `npm:${package_name}`;
+    const module = await import(pkg);
+    if (exports) {
+        return module;
+    }
+    return module.default;
+}
+
+globalThis.npmExports = (package_name, exports) => {
+    const pkg = exports ? `npm:${package_name}?exports=${exports.join(",")}` : `npm:${package_name}`;
+    return pkg;
+}
 class AssertionError extends Error {
     constructor(message) {
         super(message);
@@ -634,10 +646,7 @@ function req(type) {
 globalThis.Luwak.http = {
     Server,
     req,
-    res,
-    serve: (ops, handlers) => {
-        Deno.serve(ops, handlers)
-    }
+    res
 }
 
 globalThis.Luwak.wasm = WebAssembly
