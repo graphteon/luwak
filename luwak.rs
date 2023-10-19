@@ -17,6 +17,7 @@ use luwaklib::{deno_core, BootstrapOptions};
 use tokio::runtime::Builder;
 
 use crate::deno_core::error::AnyError;
+//use deno_core::ascii_str;
 
 fn get_error_class_name(e: &AnyError) -> &'static str {
     luwaklib::errors::get_error_class_name(e).unwrap_or("Error")
@@ -136,7 +137,15 @@ fn main() -> Result<()> {
 
         let mut worker =
             MainWorker::bootstrap_from_options(main_module.clone(), permissions, options);
-
+        // TODO Enable luwak script
+        // worker.execute_script(
+        //     "cofee.js",
+        //     ascii_str!("console.log(globalThis.Luwak.loader.compile('1+1',{ bare: true }))"),
+        // )?;
+        // worker.execute_script(
+        //     "cofee.js",
+        //     ascii_str!("console.log(globalThis.Luwak.loader.compile('1+2',{ bare: true }))"),
+        // )?;
         worker.execute_main_module(&main_module).await?;
         worker.run_event_loop(false).await?;
         Ok::<_, AnyError>(())
