@@ -31,6 +31,8 @@ impl ModuleLoader for LuwakModule {
             specifier
                 .replace("npm:@", "npm:npm@")
                 .replace("npm:", "npm://")
+                .replace("esm:@", "esm:npm@")
+                .replace("esm:", "esm://")
                 .as_str(),
             referrer,
         )?)
@@ -46,7 +48,7 @@ impl ModuleLoader for LuwakModule {
         let string_specifier = module_specifier.to_string();
         async move {
             let bytes: _ = match module_specifier.scheme() {
-                "node" | "npm" | "http" | "https" | "file" => {
+                "node" | "npm" | "http" | "https" | "file" | "esm" => {
                     let luwak_path = luwak_module().unwrap();
                     let module_url = Url::parse(module_specifier.as_str()).unwrap();
                     //println!("DEBUG module_url {}", module_specifier.as_str());
@@ -55,7 +57,8 @@ impl ModuleLoader for LuwakModule {
                             .as_str()
                             .replace("https://", "")
                             .replace("http://", "")
-                            .replace("npm://", ""),
+                            .replace("npm://", "")
+                            .replace("esm://", ""),
                     );
 
                     let path;
@@ -68,7 +71,8 @@ impl ModuleLoader for LuwakModule {
                         } else {
                             module_url
                                 .as_str()
-                                .replace("npm://", "https://esm.graphteon.id/")
+                                .replace("npm://", "https://npm.graphteon.id/")
+                                .replace("esm://", "https://esm.graphteon.id/")
                         };
 
                         //println!("module url : {}", &module_download_file);
