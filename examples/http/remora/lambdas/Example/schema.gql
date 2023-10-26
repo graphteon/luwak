@@ -1,0 +1,13 @@
+type Query {
+    getExample(id: Int!): Example
+    getExamples(topic: String): [Example]
+},
+
+type Example {
+    id: Int
+    title: String
+    author: String
+    description: String
+    topic: String
+    url: String
+}
