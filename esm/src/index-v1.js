@@ -1,4 +1,4 @@
-const API_HOST = "https://cdn.jsdelivr.net/npm"
+const API_HOST = "https://esm.sh"
 
 async function handleRequest(event) {
 	const url = new URL(event.request.url)
@@ -7,14 +7,8 @@ async function handleRequest(event) {
 	const pathWithParams = pathname + search
 	let params = pathWithParams.replace("npm@", "@");
 
-	if (!params.endsWith("+esm")) {
-		params = params+"/+esm";
-	} else {
-		params = "/"+params.split("/").slice(2).join("/");
-	}
-
-	if (params.startsWith("/npm/")) {
-		params = params.replace("/npm/","/");
+	if (params.endsWith("mjs") || params.endsWith("js") || params.endsWith("ts") || params.endsWith("jsx")) {
+		params = "/" + params.split("/").slice(2).join("/");
 	}
 
 	console.log("params", params);
@@ -23,7 +17,6 @@ async function handleRequest(event) {
 
 async function forwardRequest(event, pathWithSearch) {
 	const request = new Request(event.request);
-	console.log("URL: ",`${API_HOST}${pathWithSearch}`);
 	let response = await fetch(`${API_HOST}${pathWithSearch}`, request);
 	if(response.status == 302){
 		response = await fetch(response.url);

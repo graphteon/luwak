@@ -28,7 +28,10 @@ impl ModuleLoader for LuwakModule {
         _is_main: ResolutionKind,
     ) -> Result<ModuleSpecifier, Error> {
         Ok(resolve_import(
-            specifier.replace("npm:", "npm://").as_str(),
+            specifier
+                .replace("npm:@", "npm:npm@")
+                .replace("npm:", "npm://")
+                .as_str(),
             referrer,
         )?)
     }
@@ -57,7 +60,6 @@ impl ModuleLoader for LuwakModule {
 
                     let path;
                     if module_specifier.scheme() != "file" {
-                        //let module_download = Url::parse(module_specifier.as_str()).unwrap();
                         let module_download_file = if module_url.as_str().contains("github.com") {
                             module_url
                                 .as_str()
@@ -68,6 +70,8 @@ impl ModuleLoader for LuwakModule {
                                 .as_str()
                                 .replace("npm://", "https://esm.graphteon.id/")
                         };
+
+                        //println!("module url : {}", &module_download_file);
 
                         let save_file_to;
                         if !module_url_file.extension().is_none()
