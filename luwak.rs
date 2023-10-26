@@ -17,6 +17,7 @@ use luwaklib::{deno_core, BootstrapOptions};
 use tokio::runtime::Builder;
 
 use crate::deno_core::error::AnyError;
+//use deno_core::ascii_str;
 
 fn get_error_class_name(e: &AnyError) -> &'static str {
     luwaklib::errors::get_error_class_name(e).unwrap_or("Error")
@@ -73,21 +74,21 @@ fn main() -> Result<()> {
             maybe_binary_npm_command_name: Default::default(),
         },
         extensions: vec![luwak::init_ops_and_esm()],
-        unsafely_ignore_certificate_errors: None,
-        seed: None,
-        source_map_getter: None,
-        format_js_error_fn: None,
+        unsafely_ignore_certificate_errors: Default::default(),
+        seed: Default::default(),
+        source_map_getter: Default::default(),
+        format_js_error_fn: Default::default(),
         create_web_worker_cb,
-        maybe_inspector_server: None,
+        maybe_inspector_server: Default::default(),
         should_break_on_first_statement: false,
         module_loader,
-        npm_resolver: None,
+        npm_resolver: Default::default(),
         get_error_class_fn: Some(&get_error_class_name),
-        origin_storage_dir: None,
+        origin_storage_dir: Default::default(),
         blob_store: BlobStore::default().into(),
         broadcast_channel: InMemoryBroadcastChannel::default(),
-        shared_array_buffer_store: None,
-        compiled_wasm_module_store: None,
+        shared_array_buffer_store: Default::default(),
+        compiled_wasm_module_store: Default::default(),
         stdio: Default::default(),
         cache_storage_dir: Default::default(),
         create_params: Default::default(),
@@ -136,7 +137,15 @@ fn main() -> Result<()> {
 
         let mut worker =
             MainWorker::bootstrap_from_options(main_module.clone(), permissions, options);
-
+        // TODO Enable luwak script
+        // worker.execute_script(
+        //     "cofee.js",
+        //     ascii_str!("console.log(globalThis.Luwak.loader.compile('1+1',{ bare: true }))"),
+        // )?;
+        // worker.execute_script(
+        //     "cofee.js",
+        //     ascii_str!("console.log(globalThis.Luwak.loader.compile('1+2',{ bare: true }))"),
+        // )?;
         worker.execute_main_module(&main_module).await?;
         worker.run_event_loop(false).await?;
         Ok::<_, AnyError>(())

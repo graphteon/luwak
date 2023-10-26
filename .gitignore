@@ -40,3 +40,5 @@ node_modules
 luwak_modules
 
 out.bin
+
+fast_storage.sqlite
