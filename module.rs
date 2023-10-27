@@ -132,6 +132,8 @@ impl ModuleLoader for LuwakModule {
             //     bytes
             // };
 
+            let media_type = MediaType::from_specifier(&module_specifier.clone());
+
             let parsed = deno_ast::parse_module(ParseParams {
                 specifier: string_specifier.clone(),
                 text_info: SourceTextInfo::from_string(
@@ -144,7 +146,10 @@ impl ModuleLoader for LuwakModule {
             })?;
 
             Ok(ModuleSource::new_with_redirect(
-                ModuleType::JavaScript,
+                match &media_type {
+                    MediaType::Json => ModuleType::Json,
+                    _ => ModuleType::JavaScript,
+                },
                 parsed.transpile(&Default::default())?.text.into(),
                 &module_specifier,
                 &module_specifier,
