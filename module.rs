@@ -139,14 +139,14 @@ impl ModuleLoader for LuwakModule {
                 text_info: SourceTextInfo::from_string(
                     String::from_utf8_lossy(&bytes).into_owned(),
                 ),
-                media_type: MediaType::TypeScript,
+                media_type,
                 capture_tokens: false,
                 scope_analysis: false,
                 maybe_syntax: None,
             })?;
 
             Ok(ModuleSource::new_with_redirect(
-                match &media_type {
+                match media_type {
                     MediaType::Json => ModuleType::Json,
                     _ => ModuleType::JavaScript,
                 },
