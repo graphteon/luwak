@@ -49,7 +49,7 @@ These should pick up the `luwak` command.
 On ubuntu if you get error ssl version, you can run the following commands on the command line:
 
 ```
-wget http://nz2.archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+wget http://nz2.archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.20_amd64.deb
 sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
 ```
 
