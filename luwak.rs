@@ -9,7 +9,7 @@ use luwaklib::cli_parser;
 use luwaklib::compile;
 use luwaklib::deno_broadcast_channel::InMemoryBroadcastChannel;
 use luwaklib::deno_core::anyhow::Result;
-use luwaklib::luwak_util::{dump_luwak_module_path, info, init};
+use luwaklib::luwak_util::{dump_luwak_module_path, info, init, luwak_bin};
 use luwaklib::module::LuwakModule;
 use luwaklib::permissions::PermissionsContainer;
 use luwaklib::worker::{MainWorker, WorkerOptions};
@@ -100,12 +100,13 @@ fn main() -> Result<()> {
 
     if args.download != "" {
         let download_script = format!("#!/bin/bash\nluwak {} $@", &args.js_script);
-        let download_bin = format!("{}/.luwak/bin", env!("HOME"));
-        let download_path = format!("{}/{}", download_bin, args.download);
-        if !Path::new(&download_bin).exists() {
-            create_dir_all(&download_bin)
-                .expect("Error encountered while creating luwak bin directory!");
-        }
+        let download_bin = luwak_bin();
+        let download_path = format!(
+            "{}/{}",
+            download_bin.unwrap().to_str().unwrap(),
+            args.download
+        );
+
         if !Path::new(&download_path).exists() {
             File::create(&download_path).expect("Unable to create luwak file script");
             let metadata = std::fs::metadata(&download_path)?;
